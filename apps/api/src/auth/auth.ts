@@ -1,9 +1,12 @@
+import { Logger } from '@nestjs/common';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { organization } from 'better-auth/plugins';
+import { organization } from 'better-auth/plugins/organization';
 import Redis from 'ioredis';
 import type { Database } from '@repo/db';
 import type { EmailSender } from './email.js';
+
+const logger = new Logger('Auth');
 
 export const AUTH_TOKEN = Symbol('AUTH');
 
@@ -89,6 +92,7 @@ export function createAuth({
     session: {
       expiresIn: 60 * 60 * 24 * 7,
       updateAge: 60 * 60 * 24,
+      freshAge: 60 * 60,
       storeSessionInDatabase: true,
       cookieCache: {
         enabled: true,
@@ -117,7 +121,12 @@ export function createAuth({
         organizationLimit: 10,
         membershipLimit: 100,
         invitationExpiresIn: 60 * 60 * 24 * 7,
-        sendInvitationEmail: async ({ email, organization: org, inviter, invitation }) => {
+        sendInvitationEmail: async ({
+          email,
+          organization: org,
+          inviter,
+          invitation,
+        }) => {
           const acceptUrl = `${appUrl}/accept-invitation/${invitation.id}`;
           await sendEmail({
             to: email,
@@ -144,17 +153,14 @@ export function createAuth({
       session: {
         create: {
           after: async (session) => {
-            console.log('[auth] session.created', {
-              userId: session.userId,
-              sessionId: session.id,
-            });
+            logger.log(`Session created for user ${session.userId}`);
           },
         },
       },
       user: {
         update: {
           after: async (user) => {
-            console.log('[auth] user.updated', { userId: user.id, email: user.email });
+            logger.log(`User updated: ${user.id}`);
           },
         },
       },

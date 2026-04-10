@@ -1,4 +1,7 @@
+import { Logger } from '@nestjs/common';
 import nodemailer, { type Transporter } from 'nodemailer';
+
+const logger = new Logger('Email');
 
 export interface SendEmailOptions {
   to: string;
@@ -52,7 +55,9 @@ export function createEmailSender(config: EmailSenderConfig): EmailSender {
 
     if (!mailer) {
       if (config.nodeEnv !== 'production') {
-        console.log(`\n[Email] To: ${to}\n[Email] Subject: ${subject}\n[Email] Body: ${html}\n`);
+        logger.warn(
+          `SMTP not configured — email to ${to} (subject: ${subject}) was not sent`,
+        );
         return;
       }
 
@@ -69,7 +74,7 @@ export function createEmailSender(config: EmailSenderConfig): EmailSender {
     });
 
     if (config.nodeEnv !== 'production') {
-      console.log(`[Email] Delivered via SMTP to ${to}`);
+      logger.log(`Delivered to ${to}`);
     }
   };
 }
