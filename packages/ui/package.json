@@ -5,6 +5,10 @@
   "exports": {
     "./button": "./src/button.tsx",
     "./card": "./src/card.tsx",
+    "./input": "./src/input.tsx",
+    "./label": "./src/label.tsx",
+    "./badge": "./src/badge.tsx",
+    "./separator": "./src/separator.tsx",
     "./utils": "./src/utils.ts"
   },
   "scripts": {
