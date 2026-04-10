@@ -1,10 +1,26 @@
-import { INestApplication, Logger, ValidationPipe, VersioningType } from '@nestjs/common';
+import {
+  INestApplication,
+  Logger,
+  ValidationPipe,
+  VersioningType,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter.js';
+
+export function parseCorsOrigins(config: ConfigService): string[] {
+  return config
+    .get<string>('CORS_ORIGINS', 'http://localhost:3000')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+}
 
 export function configureApp(app: INestApplication) {
   const config = app.get(ConfigService);
+
+  app.use(helmet());
 
   app.setGlobalPrefix('api');
   app.enableVersioning({ type: VersioningType.URI });
@@ -20,14 +36,8 @@ export function configureApp(app: INestApplication) {
 
   app.useGlobalFilters(new AllExceptionsFilter());
 
-  const corsOrigins = config
-    .get<string>('CORS_ORIGINS', 'http://localhost:3000')
-    .split(',')
-    .map((origin) => origin.trim())
-    .filter(Boolean);
-
   app.enableCors({
-    origin: corsOrigins,
+    origin: parseCorsOrigins(config),
     credentials: true,
   });
 
