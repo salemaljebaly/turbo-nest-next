@@ -5,7 +5,6 @@ ARG NODE_VERSION=22
 FROM node:${NODE_VERSION}-alpine AS base
 RUN corepack enable && corepack prepare pnpm@10.33.0 --activate
 WORKDIR /app
-ENV NODE_ENV=production
 
 # --- Dependencies ---
 FROM base AS deps
@@ -22,13 +21,13 @@ RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
 FROM deps AS build
 COPY . .
 RUN pnpm --filter=@repo/db build && \
-    pnpm --filter=@repo/types build && \
     pnpm --filter=@repo/api build
 # Prune dev dependencies after build
 RUN pnpm prune --prod
 
 # --- Production ---
 FROM base AS runner
+ENV NODE_ENV=production
 LABEL org.opencontainers.image.source="https://github.com/your-org/turbo-nest-next"
 LABEL org.opencontainers.image.description="turbo-nest-next API"
 
@@ -41,7 +40,7 @@ COPY --from=build --chown=nestjs:nodejs /app/packages/db/node_modules ./packages
 COPY --from=build --chown=nestjs:nodejs /app/packages/types/node_modules ./packages/types/node_modules
 COPY --from=build --chown=nestjs:nodejs /app/apps/api/dist ./apps/api/dist
 COPY --from=build --chown=nestjs:nodejs /app/packages/db/dist ./packages/db/dist
-COPY --from=build --chown=nestjs:nodejs /app/packages/types/dist ./packages/types/dist
+COPY --from=build --chown=nestjs:nodejs /app/packages/types/src ./packages/types/src
 COPY --from=build --chown=nestjs:nodejs /app/apps/api/package.json ./apps/api/package.json
 COPY --from=build --chown=nestjs:nodejs /app/packages/db/package.json ./packages/db/package.json
 COPY --from=build --chown=nestjs:nodejs /app/packages/types/package.json ./packages/types/package.json

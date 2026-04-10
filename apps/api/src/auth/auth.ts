@@ -152,14 +152,14 @@ export function createAuth({
     databaseHooks: {
       session: {
         create: {
-          after: async (session) => {
+          after: async (session: { userId: string; id: string }) => {
             logger.log(`Session created for user ${session.userId}`);
           },
         },
       },
       user: {
         update: {
-          after: async (user) => {
+          after: async (user: { id: string }) => {
             logger.log(`User updated: ${user.id}`);
           },
         },

@@ -5,7 +5,6 @@ ARG NODE_VERSION=22
 FROM node:${NODE_VERSION}-alpine AS base
 RUN corepack enable && corepack prepare pnpm@10.33.0 --activate
 WORKDIR /app
-ENV NODE_ENV=production
 
 # --- Dependencies ---
 FROM base AS deps
@@ -21,12 +20,11 @@ RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
 # --- Build ---
 FROM deps AS build
 COPY . .
-RUN pnpm --filter=@repo/ui build && \
-    pnpm --filter=@repo/types build && \
-    pnpm --filter=@repo/web build
+RUN pnpm --filter=@repo/web build
 
 # --- Production ---
 FROM base AS runner
+ENV NODE_ENV=production
 LABEL org.opencontainers.image.source="https://github.com/your-org/turbo-nest-next"
 LABEL org.opencontainers.image.description="turbo-nest-next Web"
 
