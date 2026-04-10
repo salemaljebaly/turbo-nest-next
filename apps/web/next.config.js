@@ -13,7 +13,7 @@ const nextConfig = {
   },
 
   // ── Standalone output (recommended for Docker deployments) ──────────────
-  // output: 'standalone',
+  output: 'standalone',
 
   // ── Server-side packages that should not be bundled by Next.js ──────────
   // serverExternalPackages: ['@repo/db', 'better-auth'],
@@ -29,18 +29,21 @@ const nextConfig = {
   // },
 
   // ── Security headers ─────────────────────────────────────────────────────
-  // async headers() {
-  //   return [
-  //     {
-  //       source: '/(.*)',
-  //       headers: [
-  //         { key: 'X-Frame-Options', value: 'DENY' },
-  //         { key: 'X-Content-Type-Options', value: 'nosniff' },
-  //         { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-  //       ],
-  //     },
-  //   ];
-  // },
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'X-DNS-Prefetch-Control', value: 'on' },
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

@@ -1,0 +1,35 @@
+# Dependencies
+node_modules
+
+# Build outputs
+.next
+dist
+.turbo
+
+# Version control
+.git
+.gitignore
+
+# Environment (secrets should never enter the image)
+.env*
+!.env.example
+
+# IDE & OS
+.vscode
+.idea
+*.swp
+.DS_Store
+
+# Documentation (not needed in image)
+*.md
+LICENSE
+
+# Docker (avoid recursive context)
+**/Dockerfile
+docker/
+
+# CI/CD
+.github
+
+# Testing
+coverage
