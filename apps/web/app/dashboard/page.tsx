@@ -1,8 +1,7 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   LogOut,
   BookOpen,
@@ -11,25 +10,28 @@ import {
   User,
   ExternalLink,
   Layers,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { signOut, useSession } from "@/lib/auth/client"
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { signOut, useSession } from "@/lib/auth/client";
+
+const API_URL =
+  process.env["NEXT_PUBLIC_API_URL"] ?? "http://localhost:3001/api";
 
 const QUICK_LINKS = [
   {
     icon: BookOpen,
     title: "API Documentation",
     description: "Browse all available endpoints with Swagger UI.",
-    href: "http://localhost:3001/api/docs",
+    href: `${API_URL}/docs`,
     external: true,
     badge: "Swagger",
   },
@@ -37,7 +39,7 @@ const QUICK_LINKS = [
     icon: HeartPulse,
     title: "Health Check",
     description: "Verify database and Redis connectivity in real time.",
-    href: "http://localhost:3001/api/health",
+    href: `${API_URL}/health`,
     external: true,
     badge: "JSON",
   },
@@ -45,28 +47,22 @@ const QUICK_LINKS = [
     icon: Layers,
     title: "API Root",
     description: "The base endpoint of the NestJS REST API.",
-    href: "http://localhost:3001/api",
+    href: API_URL,
     external: true,
     badge: "REST",
   },
-]
+];
 
 export default function DashboardPage() {
-  const { data: session, isPending } = useSession()
-  const router = useRouter()
-
-  useEffect(() => {
-    if (!isPending && !session) {
-      router.replace("/sign-in")
-    }
-  }, [session, isPending, router])
+  const { data: session, isPending } = useSession();
+  const router = useRouter();
 
   async function handleSignOut() {
     await signOut({
       fetchOptions: {
         onSuccess: () => router.push("/"),
       },
-    })
+    });
   }
 
   // Loading skeleton
@@ -81,23 +77,27 @@ export default function DashboardPage() {
           </div>
           <div className="grid gap-4 sm:grid-cols-3">
             {[1, 2, 3].map((n) => (
-              <div key={n} className="h-40 animate-pulse rounded-2xl bg-muted" />
+              <div
+                key={n}
+                className="h-40 animate-pulse rounded-2xl bg-muted"
+              />
             ))}
           </div>
         </main>
       </div>
-    )
+    );
   }
 
-  if (!session) return null
+  if (!session) return null;
 
-  const { user } = session
-  const initials = user.name
-    ?.split(" ")
-    .map((n: string) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2) ?? "U"
+  const { user } = session;
+  const initials =
+    user.name
+      ?.split(" ")
+      .map((n: string) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2) ?? "U";
 
   return (
     <div className="min-h-screen bg-background">
@@ -124,10 +124,14 @@ export default function DashboardPage() {
               <div className="flex items-center gap-2">
                 <p className="font-semibold truncate">{user.name}</p>
                 {user.emailVerified && (
-                  <Badge variant="secondary" className="text-xs">Verified</Badge>
+                  <Badge variant="secondary" className="text-xs">
+                    Verified
+                  </Badge>
                 )}
               </div>
-              <p className="text-sm text-muted-foreground truncate">{user.email}</p>
+              <p className="text-sm text-muted-foreground truncate">
+                {user.email}
+              </p>
             </div>
             <Button
               variant="outline"
@@ -150,7 +154,7 @@ export default function DashboardPage() {
 
         <div className="grid gap-4 sm:grid-cols-3">
           {QUICK_LINKS.map((item) => {
-            const Icon = item.icon
+            const Icon = item.icon;
             return (
               <a
                 key={item.href}
@@ -176,14 +180,16 @@ export default function DashboardPage() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <CardTitle className="mb-1 text-base">{item.title}</CardTitle>
+                    <CardTitle className="mb-1 text-base">
+                      {item.title}
+                    </CardTitle>
                     <CardDescription className="text-xs leading-relaxed">
                       {item.description}
                     </CardDescription>
                   </CardContent>
                 </Card>
               </a>
-            )
+            );
           })}
         </div>
 
@@ -199,7 +205,7 @@ export default function DashboardPage() {
               Home
             </Link>
             <a
-              href="http://localhost:3001/api/docs"
+              href={`${API_URL}/docs`}
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-foreground transition-colors"
@@ -210,15 +216,15 @@ export default function DashboardPage() {
         </div>
       </main>
     </div>
-  )
+  );
 }
 
 function DashboardNav({
   onSignOut,
   skeleton,
 }: {
-  onSignOut?: () => void
-  skeleton?: boolean
+  onSignOut?: () => void;
+  skeleton?: boolean;
 }) {
   return (
     <header className="sticky top-0 z-40 border-b border-border/50 bg-background/80 backdrop-blur-md">
@@ -257,5 +263,5 @@ function DashboardNav({
         </div>
       </div>
     </header>
-  )
+  );
 }
