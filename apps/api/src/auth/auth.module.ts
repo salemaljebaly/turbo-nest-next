@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Database } from '@repo/db';
 import { DATABASE_TOKEN } from '../database/database.module.js';
+import { parseCorsOrigins } from '../app.setup.js';
 import { AUTH_TOKEN, createAuth } from './auth.js';
 import { AuthController } from './auth.controller.js';
 import { AuthGuard } from './auth.guard.js';
@@ -15,12 +16,7 @@ import { createEmailSender } from './email.js';
       provide: AUTH_TOKEN,
       inject: [ConfigService, DATABASE_TOKEN],
       useFactory: (config: ConfigService, db: Database) => {
-        const corsOrigins =
-          config
-            .get<string>('CORS_ORIGINS', 'http://localhost:3000')
-            .split(',')
-            .map((origin) => origin.trim())
-            .filter(Boolean);
+        const corsOrigins = parseCorsOrigins(config);
 
         const sendEmail = createEmailSender({
           appName: config.get<string>('APP_NAME', 'MyApp'),
