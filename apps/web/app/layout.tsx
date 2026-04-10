@@ -7,8 +7,12 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "App",
-  description: "Built with Next.js",
+  title: {
+    default: "turbo-nest-next",
+    template: "%s | turbo-nest-next",
+  },
+  description:
+    "Production-ready full-stack monorepo template with NestJS, Next.js, Better Auth, Drizzle ORM, PostgreSQL, and Redis.",
 };
 
 export default function RootLayout({
@@ -18,7 +22,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn("min-h-screen bg-background font-sans antialiased", inter.variable)}>
+      <body
+        className={cn(
+          "min-h-screen bg-background font-sans antialiased",
+          inter.variable,
+        )}
+      >
         <Providers>{children}</Providers>
       </body>
     </html>
