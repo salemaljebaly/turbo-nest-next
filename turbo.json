@@ -8,6 +8,7 @@
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
     "dev": {
+      "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
     },
@@ -26,7 +27,7 @@
       "inputs": ["$TURBO_DEFAULT$"]
     },
     "test:e2e": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["build", "^build"],
       "cache": false
     },
     "db:generate": {

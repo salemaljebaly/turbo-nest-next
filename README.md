@@ -1,159 +1,210 @@
-# Turborepo starter
+# turbo-nest-next
 
-This Turborepo starter is maintained by the Turborepo core team.
+Production-ready monorepo with a **NestJS REST API** and **Next.js** frontend.
 
-## Using this example
+## Stack
 
-Run the following command:
+| Layer | Package | Version |
+|-------|---------|---------|
+| Monorepo | Turborepo + pnpm | 2.9 / 10 |
+| Backend | NestJS | 11.x |
+| API docs | @nestjs/swagger (OpenAPI) | — |
+| Auth | Better Auth | 1.6.x |
+| ORM | Drizzle ORM | 0.45.x |
+| Database | PostgreSQL 17 | — |
+| Cache | Redis 8 | — |
+| Storage | MinIO | — |
+| Frontend | Next.js (App Router) | 16.2 |
+| UI | shadcn/ui — **luma** style | v4 |
+| Styling | Tailwind CSS | v4 |
+| Data fetching | TanStack Query | v5 |
+| Shared types | Zod | 4.x |
+| Testing | Vitest | 4.x |
+| CI | GitHub Actions | — |
 
-```sh
-npx create-turbo@latest
+## Structure
+
+```
+.
+├── apps/
+│   ├── api/                        # NestJS REST API (port 3001)
+│   │   └── src/
+│   │       ├── auth/               # Better Auth integration + AuthGuard
+│   │       ├── common/filters/     # Global exception filter
+│   │       ├── database/           # Drizzle DB module (NestJS DI)
+│   │       ├── health/             # GET /api/health (DB + Redis probes)
+│   │       └── users/              # Example feature module (GET /api/v1/users/me)
+│   └── web/                        # Next.js frontend (port 3000)
+│       ├── app/                    # App Router pages + layouts
+│       ├── components/ui/          # app-level shadcn/ui wrappers
+│       └── lib/
+│           ├── api.ts              # Type-safe API client
+│           └── auth/client.ts      # Better Auth client
+├── packages/
+│   ├── db/                         # Drizzle schema + migrations
+│   ├── types/                      # Shared Zod schemas
+│   ├── ui/                         # Shared React components
+│   ├── eslint-config/              # Shared ESLint configs
+│   └── typescript-config/          # Shared tsconfigs
+├── docker/
+│   └── docker-compose.yml          # PostgreSQL · Redis · MinIO · MailHog
+└── .env.example
 ```
 
-## What's inside?
+## Getting Started
 
-This Turborepo includes the following packages/apps:
+### 1. Install dependencies
 
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+```bash
+pnpm install
 ```
 
-Without global `turbo`, use your package manager:
+### 2. Configure environment
 
-```sh
-cd my-turborepo
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+```bash
+cp .env.example .env
+# Edit .env — at minimum set BETTER_AUTH_SECRET to a random 32-char string:
+# openssl rand -base64 32
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+For local development, the API will read `.env` from either `apps/api/.env` or the monorepo root `.env`.
+This means you can run the API standalone or as part of the workspace without changing code.
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+### 3. Start infrastructure
 
-```sh
-turbo build --filter=docs
+```bash
+pnpm infra:up
 ```
 
-Without global `turbo`:
+### 4. Run migrations
 
-```sh
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+```bash
+pnpm db:generate
+pnpm db:migrate
 ```
 
-### Develop
+### 5. Start development
 
-To develop all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo dev
+```bash
+pnpm dev
 ```
 
-Without global `turbo`, use your package manager:
+| Service | URL |
+|---------|-----|
+| Web | http://localhost:3000 |
+| API | http://localhost:3001/api |
+| Swagger | http://localhost:3001/api/docs |
+| Health | http://localhost:3001/api/health |
+| Invitation accept flow | http://localhost:3000/accept-invitation/:id |
+| MinIO console | http://localhost:9001 |
+| MailHog UI | http://localhost:8025 |
 
-```sh
-cd my-turborepo
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Start all apps in watch mode |
+| `pnpm build` | Build all apps and packages |
+| `pnpm test` | Run Vitest across all packages |
+| `pnpm api:dev` | Run only the API, including `@repo/db` prebuild |
+| `pnpm web:dev` | Run only the web app |
+| `pnpm infra:up` | Start PostgreSQL, Redis, MinIO, and MailHog |
+| `pnpm infra:down` | Stop local infrastructure |
+| `pnpm lint` | Lint all packages |
+| `pnpm check-types` | TypeScript check all packages |
+| `pnpm format` | Format with Prettier |
+| `pnpm db:generate` | Generate Drizzle migrations |
+| `pnpm db:migrate` | Apply migrations |
+| `pnpm db:studio` | Open Drizzle Studio |
+
+## How-to
+
+### Add a new feature module to the API
+
+```bash
+cd apps/api
+cp .env.example .env
+nest generate module features/posts
+nest generate controller features/posts
+nest generate service features/posts
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+### Add a shadcn/ui component to apps/web
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=web
+```bash
+cd apps/web
+pnpm dlx shadcn@latest add input dialog table
 ```
 
-Without global `turbo`:
+### Add a shared DB table
 
-```sh
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+1. Create `packages/db/src/schema/posts.ts`
+2. Export it from `packages/db/src/schema/index.ts`
+3. Run `pnpm db:generate && pnpm db:migrate`
+
+### Add a shared type/schema
+
+Add to `packages/types/src/`, export from `packages/types/src/index.ts`.
+Import in any app: `import { MySchema } from '@repo/types'`
+
+### Use the API client in Next.js
+
+```typescript
+import { useQuery } from '@tanstack/react-query';
+import { api } from '@/lib/api';
+
+export function usePosts() {
+  return useQuery({
+    queryKey: ['posts'],
+    queryFn: () => api.get<Post[]>('/posts'),
+  });
+}
 ```
 
-### Remote Caching
+### Use auth in Next.js
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+```typescript
+'use client';
+import { useSession, signIn, signOut } from '@/lib/auth/client';
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
+export function UserMenu() {
+  const { data: session } = useSession();
+  // ...
+}
 ```
 
-Without global `turbo`, use your package manager:
+### Email delivery
 
-```sh
-cd my-turborepo
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
+- Development uses MailHog SMTP by default via `SMTP_HOST=localhost` and `SMTP_PORT=1025`.
+- Production requires a real SMTP server. Set `SMTP_HOST`, `SMTP_PORT`, and ideally `SMTP_FROM`.
+- Optional auth is supported with `SMTP_USER` and `SMTP_PASS`.
+
+### Protect an API endpoint
+
+```typescript
+import { Controller, Get, UseGuards, Req } from '@nestjs/common';
+import { AuthGuard, type SessionRequest } from '../auth/auth.guard.js';
+
+@Controller({ path: 'posts', version: '1' })
+export class PostsController {
+  @Get('drafts')
+  @UseGuards(AuthGuard)
+  getDrafts(@Req() req: SessionRequest) {
+    // req.session.user is typed and guaranteed to be present
+    return this.postsService.getDraftsByUser(req.session.user.id);
+  }
+}
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+### Reuse the API outside the monorepo
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+- The API now resolves env files from its own working directory first, then falls back to the monorepo root.
+- Running `pnpm dev` or `pnpm start:prod` from `apps/api` now prebuilds `@repo/db`, so the API package works directly from its own directory on a fresh clone.
+- Shared packages are still workspace dependencies. If you extract the API into a separate repo, move or publish `packages/db`, `packages/types`, `packages/eslint-config`, and `packages/typescript-config`.
+- Start by copying [apps/api/.env.example](/Users/lamah/development/turborepo-nestjs-nextjs-template/apps/api/.env.example) to `apps/api/.env` when you want the API to run independently of the root `.env`.
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+### Reuse the web app outside the monorepo
 
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+- The web app only requires `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_AUTH_URL`.
+- Start by copying [apps/web/.env.example](/Users/lamah/development/turborepo-nestjs-nextjs-template/apps/web/.env.example) to `apps/web/.env.local`.
+- If you extract the web app into a separate repo, move or publish `packages/ui`, `packages/types`, `packages/eslint-config`, and `packages/typescript-config`.

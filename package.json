@@ -1,28 +1,35 @@
 {
-  "name": "turborepo-nestjs-nextjs-template",
+  "name": "turbo-nest-next",
   "private": true,
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
     "start": "turbo run start",
+    "api:dev": "pnpm --filter=@repo/api dev",
+    "web:dev": "pnpm --filter=@repo/web dev",
+    "api:start:prod": "pnpm --filter=@repo/api start:prod",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\" --ignore-path .gitignore",
     "check-types": "turbo run check-types",
     "test": "turbo run test",
     "test:e2e": "turbo run test:e2e",
-    "db:generate": "turbo run db:generate --filter=@repo/api",
-    "db:migrate": "turbo run db:migrate --filter=@repo/api",
-    "db:studio": "turbo run db:studio --filter=@repo/api",
+    "infra:up": "docker compose -f docker/docker-compose.yml up -d",
+    "infra:down": "docker compose -f docker/docker-compose.yml down",
+    "infra:logs": "docker compose -f docker/docker-compose.yml logs -f",
+    "db:generate": "dotenv -e .env -- turbo run db:generate --filter=@repo/db",
+    "db:migrate": "dotenv -e .env -- turbo run db:migrate --filter=@repo/db",
+    "db:studio": "dotenv -e .env -- turbo run db:studio --filter=@repo/db",
     "clean": "turbo run clean && rm -rf node_modules"
   },
   "devDependencies": {
-    "prettier": "^3.7.4",
-    "turbo": "^2.9.3",
-    "typescript": "5.9.2"
+    "dotenv-cli": "^11.0.0",
+    "prettier": "^3.8.1",
+    "turbo": "^2.9.4",
+    "typescript": "6.0.2"
   },
-  "packageManager": "pnpm@10.32.0",
+  "packageManager": "pnpm@10.33.0",
   "engines": {
     "node": ">=22.0.0",
-    "pnpm": ">=9.0.0"
+    "pnpm": ">=10.0.0"
   }
 }

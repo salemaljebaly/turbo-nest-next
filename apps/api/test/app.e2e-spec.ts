@@ -1,29 +1,65 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
-import request from 'supertest';
-import { App } from 'supertest/types';
-import { AppModule } from './../src/app.module';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { spawn, type ChildProcessWithoutNullStreams } from 'node:child_process';
+import { setTimeout as delay } from 'node:timers/promises';
+
+const PORT = 3101;
+const BASE_URL = `http://127.0.0.1:${PORT}`;
+
+let serverProcess: ChildProcessWithoutNullStreams | null = null;
+
+async function waitForServer() {
+  for (let attempt = 0; attempt < 30; attempt += 1) {
+    try {
+      const response = await fetch(`${BASE_URL}/api`);
+      if (response.ok) return;
+    } catch {
+      // Server is still starting up.
+    }
+
+    await delay(500);
+  }
+
+  throw new Error('API server did not become ready in time.');
+}
 
 describe('AppController (e2e)', () => {
-  let app: INestApplication<App>;
+  beforeAll(async () => {
+    serverProcess = spawn('node', ['dist/main.js'], {
+      cwd: process.cwd(),
+      env: {
+        ...process.env,
+        PORT: String(PORT),
+        NODE_ENV: 'test',
+      },
+      stdio: 'pipe',
+    });
 
-  beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
+    serverProcess.stdout.on('data', () => {
+      // Keep stdout drained so the child process cannot block on output.
+    });
 
-    app = moduleFixture.createNestApplication();
-    await app.init();
+    serverProcess.stderr.on('data', () => {
+      // Keep stderr drained so the child process cannot block on output.
+    });
+
+    await waitForServer();
+  }, 30000);
+
+  afterAll(async () => {
+    if (!serverProcess || serverProcess.killed) return;
+
+    serverProcess.kill('SIGTERM');
+    await delay(500);
+
+    if (!serverProcess.killed) {
+      serverProcess.kill('SIGKILL');
+    }
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
-  });
+  it('GET /api should return 200', async () => {
+    const response = await fetch(`${BASE_URL}/api`);
 
-  afterEach(async () => {
-    await app.close();
+    expect(response.status).toBe(200);
+    await expect(response.text()).resolves.toContain('Hello from');
   });
 });

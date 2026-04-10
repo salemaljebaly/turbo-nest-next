@@ -1,8 +1,23 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { AppModule } from './app.module.js';
+import { configureApp, logAppStartup } from './app.setup.js';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.PORT ?? 3000);
+  const app = await NestFactory.create(AppModule, {
+    logger: ['error', 'warn', 'log', 'debug'],
+  });
+
+  const logger = new Logger('Bootstrap');
+  const config = app.get(ConfigService);
+
+  configureApp(app);
+
+  const port = config.get<number>('PORT', 3001);
+  await app.listen(port);
+
+  logAppStartup(logger, port);
 }
-bootstrap();
+
+void bootstrap();
