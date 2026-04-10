@@ -1,4 +1,5 @@
-import Link from "next/link"
+import type { Metadata } from "next";
+import Link from "next/link";
 import {
   ShieldCheck,
   Code2,
@@ -8,10 +9,16 @@ import {
   BookOpen,
   ArrowRight,
   ExternalLink,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Navbar } from "@/components/navbar"
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Navbar } from "@/components/navbar";
+
+export const metadata: Metadata = {
+  title: "Home",
+  description:
+    "Ship your next project with NestJS, Next.js, Better Auth, and Drizzle — everything wired together so you can focus on your product.",
+};
 
 const STACK = [
   "Turborepo 2",
@@ -23,7 +30,7 @@ const STACK = [
   "PostgreSQL",
   "Redis",
   "Tailwind v4",
-]
+];
 
 const FEATURES = [
   {
@@ -62,7 +69,9 @@ const FEATURES = [
     description:
       "Swagger UI auto-generated from your NestJS controllers. Always up-to-date, zero configuration.",
   },
-]
+];
+
+const API_URL = process.env["NEXT_PUBLIC_API_URL"] ?? "${API_URL}";
 
 export default function Home() {
   return (
@@ -101,7 +110,8 @@ export default function Home() {
 
           <p className="mb-10 max-w-xl mx-auto text-lg text-muted-foreground leading-relaxed">
             Ship your next project with NestJS, Next.js, Better Auth, and
-            Drizzle — everything wired together so you can focus on your product.
+            Drizzle — everything wired together so you can focus on your
+            product.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3">
@@ -113,7 +123,7 @@ export default function Home() {
             </Button>
             <Button size="lg" variant="outline" asChild>
               <a
-                href="http://localhost:3001/api/docs"
+                href={`${API_URL}/docs`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -153,13 +163,15 @@ export default function Home() {
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
               Everything you need.
               <br />
-              <span className="text-muted-foreground font-normal">Nothing you don&apos;t.</span>
+              <span className="text-muted-foreground font-normal">
+                Nothing you don&apos;t.
+              </span>
             </h2>
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map((feature) => {
-              const Icon = feature.icon
+              const Icon = feature.icon;
               return (
                 <div
                   key={feature.title}
@@ -173,7 +185,7 @@ export default function Home() {
                     {feature.description}
                   </p>
                 </div>
-              )
+              );
             })}
           </div>
         </div>
@@ -202,7 +214,7 @@ export default function Home() {
               </Button>
               <Button size="lg" variant="outline" asChild>
                 <a
-                  href="http://localhost:3001/api/health"
+                  href={`${API_URL}/health`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -219,13 +231,15 @@ export default function Home() {
       <footer className="border-t border-border/50 px-6 py-8">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span className="font-semibold text-foreground">turbo-nest-next</span>
+            <span className="font-semibold text-foreground">
+              turbo-nest-next
+            </span>
             <span>·</span>
             <span>MIT License</span>
           </div>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <a
-              href="http://localhost:3001/api/docs"
+              href={`${API_URL}/docs`}
               target="_blank"
               rel="noopener noreferrer"
               className="transition-colors hover:text-foreground"
@@ -233,19 +247,22 @@ export default function Home() {
               API Docs
             </a>
             <a
-              href="http://localhost:3001/api/health"
+              href={`${API_URL}/health`}
               target="_blank"
               rel="noopener noreferrer"
               className="transition-colors hover:text-foreground"
             >
               Health
             </a>
-            <Link href="/sign-in" className="transition-colors hover:text-foreground">
+            <Link
+              href="/sign-in"
+              className="transition-colors hover:text-foreground"
+            >
               Sign in
             </Link>
           </div>
         </div>
       </footer>
     </div>
-  )
+  );
 }
