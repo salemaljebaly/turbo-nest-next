@@ -1,21 +1,27 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Zap, LogOut, LayoutDashboard } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { signOut, useSession } from "@/lib/auth/client"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Zap, LogOut, LayoutDashboard } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { signOut, useSession } from "@/lib/auth/client";
 
 export function Navbar() {
-  const { data: session, isPending } = useSession()
-  const router = useRouter()
+  const { data: session, isPending } = useSession();
+  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   async function handleSignOut() {
     await signOut({
       fetchOptions: {
         onSuccess: () => router.push("/"),
       },
-    })
+    });
   }
 
   return (
@@ -34,7 +40,7 @@ export function Navbar() {
 
         {/* Right side */}
         <div className="flex items-center gap-2">
-          {isPending ? (
+          {!mounted || isPending ? (
             <div className="h-8 w-32 animate-pulse rounded-lg bg-muted" />
           ) : session ? (
             <>
@@ -59,9 +65,7 @@ export function Navbar() {
           ) : (
             <>
               <Button asChild variant="ghost" size="sm">
-                <Link href="/sign-in">
-                  Sign in
-                </Link>
+                <Link href="/sign-in">Sign in</Link>
               </Button>
               <Button asChild size="sm">
                 <Link href="/sign-up">Get started</Link>
@@ -71,5 +75,5 @@ export function Navbar() {
         </div>
       </div>
     </header>
-  )
+  );
 }
