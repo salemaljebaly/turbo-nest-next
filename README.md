@@ -119,6 +119,11 @@ pnpm dev
 
 ## How-to
 
+Short guides:
+
+- [Architecture](./docs/architecture.md)
+- [Scaling path](./docs/scaling.md)
+
 ### Add a new feature module to the API
 
 ```bash
