@@ -14,7 +14,7 @@ describe('AppController', () => {
   };
   const controller = new AppController(mockService as AppService);
 
-  it('should return a greeting string', () => {
-    expect(controller.getHello()).toBe('Hello from TestApp!');
+  it('should return API information', () => {
+    expect(controller.getHello()).toEqual({ message: 'Hello from TestApp!' });
   });
 });

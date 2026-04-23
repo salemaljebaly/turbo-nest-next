@@ -60,6 +60,11 @@ describe('AppController (e2e)', () => {
     const response = await fetch(`${BASE_URL}/api`);
 
     expect(response.status).toBe(200);
-    await expect(response.text()).resolves.toContain('Hello from');
+    await expect(response.json()).resolves.toMatchObject({
+      success: true,
+      data: {
+        message: expect.stringContaining('Hello from'),
+      },
+    });
   });
 });
