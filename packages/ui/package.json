@@ -4,6 +4,7 @@
   "private": true,
   "exports": {
     "./button": "./src/button.tsx",
+    "./button-variants": "./src/button-variants.ts",
     "./card": "./src/card.tsx",
     "./input": "./src/input.tsx",
     "./label": "./src/label.tsx",

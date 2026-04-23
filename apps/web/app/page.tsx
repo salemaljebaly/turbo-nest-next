@@ -10,7 +10,7 @@ import {
   ArrowRight,
   ExternalLink,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@repo/ui/button-variants";
 import { Badge } from "@/components/ui/badge";
 import { Navbar } from "@/components/navbar";
 
@@ -71,7 +71,8 @@ const FEATURES = [
   },
 ];
 
-const API_URL = process.env["NEXT_PUBLIC_API_URL"] ?? "${API_URL}";
+const API_URL =
+  process.env["NEXT_PUBLIC_API_URL"] ?? "http://localhost:3001/api";
 
 export default function Home() {
   return (
@@ -115,22 +116,19 @@ export default function Home() {
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <Button size="lg" asChild>
-              <Link href="/sign-up">
-                Get started
-                <ArrowRight className="size-4" />
-              </Link>
-            </Button>
-            <Button size="lg" variant="outline" asChild>
-              <a
-                href={`${API_URL}/docs`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                API docs
-                <ExternalLink className="size-4" />
-              </a>
-            </Button>
+            <Link href="/sign-up" className={buttonVariants({ size: "lg" })}>
+              Get started
+              <ArrowRight className="size-4" />
+            </Link>
+            <a
+              href={`${API_URL}/docs`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={buttonVariants({ size: "lg", variant: "outline" })}
+            >
+              API docs
+              <ExternalLink className="size-4" />
+            </a>
           </div>
         </div>
 
@@ -206,22 +204,19 @@ export default function Home() {
               pnpm install && pnpm dev
             </div>
             <div className="flex flex-wrap justify-center gap-3">
-              <Button size="lg" asChild>
-                <Link href="/sign-up">
-                  Create account
-                  <ArrowRight className="size-4" />
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild>
-                <a
-                  href={`${API_URL}/health`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Health check
-                  <ExternalLink className="size-4" />
-                </a>
-              </Button>
+              <Link href="/sign-up" className={buttonVariants({ size: "lg" })}>
+                Create account
+                <ArrowRight className="size-4" />
+              </Link>
+              <a
+                href={`${API_URL}/health`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={buttonVariants({ size: "lg", variant: "outline" })}
+              >
+                Health check
+                <ExternalLink className="size-4" />
+              </a>
             </div>
           </div>
         </div>
