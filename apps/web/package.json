@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "eslint --max-warnings 0",
     "check-types": "next typegen && tsc --noEmit",
+    "test": "vitest run",
     "api:generate": "openapi-typescript ../../apps/api/openapi.json -o lib/api-schema.ts"
   },
   "dependencies": {
@@ -38,6 +39,7 @@
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "eslint": "^10.2.0",
-    "typescript": "6.0.2"
+    "typescript": "6.0.2",
+    "vitest": "^4.1.2"
   }
 }

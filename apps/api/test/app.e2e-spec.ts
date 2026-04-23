@@ -56,14 +56,35 @@ describe('AppController (e2e)', () => {
     }
   });
 
-  it('GET /api should return 200', async () => {
-    const response = await fetch(`${BASE_URL}/api`);
+  it('GET /api should return the standard envelope and request id', async () => {
+    const requestId = 'test-request-id';
+    const response = await fetch(`${BASE_URL}/api`, {
+      headers: { 'x-request-id': requestId },
+    });
 
     expect(response.status).toBe(200);
+    expect(response.headers.get('x-request-id')).toBe(requestId);
     await expect(response.json()).resolves.toMatchObject({
       success: true,
       data: {
         message: expect.stringContaining('Hello from'),
+      },
+    });
+  });
+
+  it('GET /api/missing should return the standard error envelope and request id', async () => {
+    const requestId = 'missing-request-id';
+    const response = await fetch(`${BASE_URL}/api/missing`, {
+      headers: { 'x-request-id': requestId },
+    });
+
+    expect(response.status).toBe(404);
+    expect(response.headers.get('x-request-id')).toBe(requestId);
+    await expect(response.json()).resolves.toMatchObject({
+      success: false,
+      error: {
+        requestId,
+        path: '/api/missing',
       },
     });
   });
