@@ -4,23 +4,23 @@ Production-ready monorepo with a **NestJS REST API** and **Next.js** frontend.
 
 ## Stack
 
-| Layer | Package | Version |
-|-------|---------|---------|
-| Monorepo | Turborepo + pnpm | 2.9 / 10 |
-| Backend | NestJS | 11.x |
-| API docs | @nestjs/swagger (OpenAPI) | — |
-| Auth | Better Auth | 1.6.x |
-| ORM | Drizzle ORM | 0.45.x |
-| Database | PostgreSQL 17 | — |
-| Cache | Redis 8 | — |
-| Storage | MinIO | — |
-| Frontend | Next.js (App Router) | 16.2 |
-| UI | shadcn/ui — **luma** style | v4 |
-| Styling | Tailwind CSS | v4 |
-| Data fetching | TanStack Query | v5 |
-| Shared types | Zod | 4.x |
-| Testing | Vitest | 4.x |
-| CI | GitHub Actions | — |
+| Layer         | Package                    | Version  |
+| ------------- | -------------------------- | -------- |
+| Monorepo      | Turborepo + pnpm           | 2.9 / 10 |
+| Backend       | NestJS                     | 11.x     |
+| API docs      | @nestjs/swagger (OpenAPI)  | —        |
+| Auth          | Better Auth                | 1.6.x    |
+| ORM           | Drizzle ORM                | 0.45.x   |
+| Database      | PostgreSQL 17              | —        |
+| Cache         | Redis 8                    | —        |
+| Storage       | MinIO                      | —        |
+| Frontend      | Next.js (App Router)       | 16.2     |
+| UI            | shadcn/ui — **luma** style | v4       |
+| Styling       | Tailwind CSS               | v4       |
+| Data fetching | TanStack Query             | v5       |
+| Shared types  | Zod                        | 4.x      |
+| Testing       | Vitest                     | 4.x      |
+| CI            | GitHub Actions             | —        |
 
 ## Structure
 
@@ -36,14 +36,14 @@ Production-ready monorepo with a **NestJS REST API** and **Next.js** frontend.
 │   │       └── users/              # Example feature module (GET /api/v1/users/me)
 │   └── web/                        # Next.js frontend (port 3000)
 │       ├── app/                    # App Router pages + layouts
-│       ├── components/ui/          # app-level shadcn/ui wrappers
+│       ├── components/ui/          # app-level shadcn/ui entrypoints
 │       └── lib/
 │           ├── api.ts              # Type-safe API client
 │           └── auth/client.ts      # Better Auth client
 ├── packages/
 │   ├── db/                         # Drizzle schema + migrations
 │   ├── types/                      # Shared Zod schemas
-│   ├── ui/                         # Shared React components
+│   ├── ui/                         # Shared UI primitives consumed by app wrappers
 │   ├── eslint-config/              # Shared ESLint configs
 │   └── typescript-config/          # Shared tsconfigs
 ├── docker/
@@ -89,33 +89,33 @@ pnpm db:migrate
 pnpm dev
 ```
 
-| Service | URL |
-|---------|-----|
-| Web | http://localhost:3000 |
-| API | http://localhost:3001/api |
-| Swagger | http://localhost:3001/api/docs |
-| Health | http://localhost:3001/api/health |
+| Service                | URL                                         |
+| ---------------------- | ------------------------------------------- |
+| Web                    | http://localhost:3000                       |
+| API                    | http://localhost:3001/api                   |
+| Swagger                | http://localhost:3001/api/docs              |
+| Health                 | http://localhost:3001/api/health            |
 | Invitation accept flow | http://localhost:3000/accept-invitation/:id |
-| MinIO console | http://localhost:9001 |
-| MailHog UI | http://localhost:8025 |
+| MinIO console          | http://localhost:9001                       |
+| MailHog UI             | http://localhost:8025                       |
 
 ## Commands
 
-| Command | Description |
-|---------|-------------|
-| `pnpm dev` | Start all apps in watch mode |
-| `pnpm build` | Build all apps and packages |
-| `pnpm test` | Run Vitest across all packages |
-| `pnpm api:dev` | Run only the API, including `@repo/db` prebuild |
-| `pnpm web:dev` | Run only the web app |
-| `pnpm infra:up` | Start PostgreSQL, Redis, MinIO, and MailHog |
-| `pnpm infra:down` | Stop local infrastructure |
-| `pnpm lint` | Lint all packages |
-| `pnpm check-types` | TypeScript check all packages |
-| `pnpm format` | Format with Prettier |
-| `pnpm db:generate` | Generate Drizzle migrations |
-| `pnpm db:migrate` | Apply migrations |
-| `pnpm db:studio` | Open Drizzle Studio |
+| Command            | Description                                     |
+| ------------------ | ----------------------------------------------- |
+| `pnpm dev`         | Start all apps in watch mode                    |
+| `pnpm build`       | Build all apps and packages                     |
+| `pnpm test`        | Run Vitest across all packages                  |
+| `pnpm api:dev`     | Run only the API, including `@repo/db` prebuild |
+| `pnpm web:dev`     | Run only the web app                            |
+| `pnpm infra:up`    | Start PostgreSQL, Redis, MinIO, and MailHog     |
+| `pnpm infra:down`  | Stop local infrastructure                       |
+| `pnpm lint`        | Lint all packages                               |
+| `pnpm check-types` | TypeScript check all packages                   |
+| `pnpm format`      | Format with Prettier                            |
+| `pnpm db:generate` | Generate Drizzle migrations                     |
+| `pnpm db:migrate`  | Apply migrations                                |
+| `pnpm db:studio`   | Open Drizzle Studio                             |
 
 ## How-to
 
@@ -136,6 +136,12 @@ cd apps/web
 pnpm dlx shadcn@latest add input dialog table
 ```
 
+UI ownership rule:
+
+- App code imports UI through `@/components/ui/*`.
+- `apps/web/components/ui/*` is the app-level shadcn surface and may re-export shared primitives.
+- `packages/ui` owns reusable primitives only; do not import it directly from app routes/components unless you are intentionally creating a new app-level wrapper.
+
 ### Add a shared DB table
 
 1. Create `packages/db/src/schema/posts.ts`
@@ -150,13 +156,13 @@ Import in any app: `import { MySchema } from '@repo/types'`
 ### Use the API client in Next.js
 
 ```typescript
-import { useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
 
 export function usePosts() {
   return useQuery({
-    queryKey: ['posts'],
-    queryFn: () => api.get<Post[]>('/posts'),
+    queryKey: ["posts"],
+    queryFn: () => api.get<Post[]>("/posts"),
   });
 }
 ```
@@ -164,8 +170,8 @@ export function usePosts() {
 ### Use auth in Next.js
 
 ```typescript
-'use client';
-import { useSession, signIn, signOut } from '@/lib/auth/client';
+"use client";
+import { useSession, signIn, signOut } from "@/lib/auth/client";
 
 export function UserMenu() {
   const { data: session } = useSession();
@@ -182,12 +188,12 @@ export function UserMenu() {
 ### Protect an API endpoint
 
 ```typescript
-import { Controller, Get, UseGuards, Req } from '@nestjs/common';
-import { AuthGuard, type SessionRequest } from '../auth/auth.guard.js';
+import { Controller, Get, UseGuards, Req } from "@nestjs/common";
+import { AuthGuard, type SessionRequest } from "../auth/auth.guard.js";
 
-@Controller({ path: 'posts', version: '1' })
+@Controller({ path: "posts", version: "1" })
 export class PostsController {
-  @Get('drafts')
+  @Get("drafts")
   @UseGuards(AuthGuard)
   getDrafts(@Req() req: SessionRequest) {
     // req.session.user is typed and guaranteed to be present
