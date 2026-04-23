@@ -9,6 +9,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import type { OpenAPIObject } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter.js';
+import { requestContextMiddleware } from './common/middleware/request-context.middleware.js';
 
 export function parseCorsOrigins(config: ConfigService): string[] {
   return config
@@ -22,6 +23,7 @@ export function configureApp(app: INestApplication) {
   const config = app.get(ConfigService);
 
   app.use(helmet());
+  app.use(requestContextMiddleware);
 
   app.setGlobalPrefix('api');
   app.enableVersioning({ type: VersioningType.URI });

@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { ApiResponseInterceptor } from './common/interceptors/api-response.interceptor.js';
+import { RequestLoggingInterceptor } from './common/interceptors/request-logging.interceptor.js';
 import { AuthModule } from './auth/auth.module.js';
 import { validate } from './config/env.validation.js';
 import { DatabaseModule } from './database/database.module.js';
@@ -34,6 +35,10 @@ import { UsersModule } from './users/users.module.js';
     {
       provide: APP_INTERCEPTOR,
       useClass: ApiResponseInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: RequestLoggingInterceptor,
     },
   ],
 })

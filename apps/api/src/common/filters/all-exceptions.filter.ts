@@ -7,6 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
+import type { RequestWithContext } from '../middleware/request-context.middleware.js';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -15,7 +16,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
+    const request = ctx.getRequest<RequestWithContext>();
+    const requestId = request.context?.requestId ?? 'unknown';
 
     const status =
       exception instanceof HttpException
@@ -29,7 +31,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
       typeof exceptionResponse === 'string'
         ? exceptionResponse
         : typeof exceptionResponse === 'object' && exceptionResponse !== null
-          ? (exceptionResponse as Record<string, unknown>)['message'] ?? 'An error occurred'
+          ? ((exceptionResponse as Record<string, unknown>)['message'] ??
+            'An error occurred')
           : 'Internal server error';
     const normalizedMessage =
       typeof message === 'string'
@@ -40,18 +43,22 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     if (status >= 500) {
       this.logger.error(
-        `${request.method} ${request.url} → ${status}`,
+        `${request.method} ${request.url} → ${status} requestId=${requestId}`,
         exception instanceof Error ? exception.stack : String(exception),
       );
     } else {
-      this.logger.warn(`${request.method} ${request.url} → ${status}: ${normalizedMessage}`);
+      this.logger.warn(
+        `${request.method} ${request.url} → ${status}: ${normalizedMessage} requestId=${requestId}`,
+      );
     }
 
     response.status(status).json({
       success: false,
       error: {
-        code: HttpStatus[status as unknown as keyof typeof HttpStatus] ?? 'UNKNOWN',
+        code:
+          HttpStatus[status as unknown as keyof typeof HttpStatus] ?? 'UNKNOWN',
         message: normalizedMessage,
+        requestId,
         path: request.url,
         timestamp: new Date().toISOString(),
       },
