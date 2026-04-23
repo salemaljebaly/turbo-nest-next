@@ -1,8 +1,16 @@
 import { isApiError, isApiResponse } from "@repo/types";
+import type { paths } from "./api-schema";
 
 const BASE_URL =
   process.env["NEXT_PUBLIC_API_URL"] ?? "http://localhost:3001/api";
 const EMPTY_RESPONSE_STATUSES = new Set([204, 205, 304]);
+
+type ApiSchemaPath = keyof paths & string;
+export type ApiPath = ApiSchemaPath extends `/api${infer Path}`
+  ? Path extends ""
+    ? "/"
+    : Path
+  : never;
 
 class ApiError extends Error {
   constructor(
@@ -105,11 +113,11 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  get: <T>(path: string, options?: Omit<RequestInit, "method" | "body">) =>
+  get: <T>(path: ApiPath, options?: Omit<RequestInit, "method" | "body">) =>
     request<T>(path, { method: "GET", ...options }),
 
   post: <T>(
-    path: string,
+    path: ApiPath,
     body: unknown,
     options?: Omit<RequestInit, "method" | "body">,
   ) =>
@@ -120,7 +128,7 @@ export const api = {
     }),
 
   patch: <T>(
-    path: string,
+    path: ApiPath,
     body: unknown,
     options?: Omit<RequestInit, "method" | "body">,
   ) =>
@@ -131,13 +139,13 @@ export const api = {
     }),
 
   put: <T>(
-    path: string,
+    path: ApiPath,
     body: unknown,
     options?: Omit<RequestInit, "method" | "body">,
   ) =>
     request<T>(path, { method: "PUT", body: JSON.stringify(body), ...options }),
 
-  delete: <T>(path: string, options?: Omit<RequestInit, "method" | "body">) =>
+  delete: <T>(path: ApiPath, options?: Omit<RequestInit, "method" | "body">) =>
     request<T>(path, { method: "DELETE", ...options }),
 };
 

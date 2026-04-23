@@ -9,6 +9,7 @@
     "db:prepare": "pnpm --filter=@repo/db build",
     "prebuild": "pnpm run db:prepare",
     "build": "nest build",
+    "openapi:generate": "pnpm run build && node dist/openapi",
     "predev": "pnpm run db:prepare",
     "dev": "nest start --watch",
     "start": "nest start",

@@ -16,7 +16,7 @@ export class UserResponseDto {
   @ApiProperty()
   emailVerified!: boolean;
 
-  @ApiProperty({ required: false, nullable: true })
+  @ApiProperty({ type: String, required: false, nullable: true })
   image!: string | null;
 
   @ApiProperty()
