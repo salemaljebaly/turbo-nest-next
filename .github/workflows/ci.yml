@@ -40,6 +40,9 @@ jobs:
       - name: Type check
         run: pnpm check-types
 
+      - name: API contract
+        run: pnpm api:check
+
       - name: Test
         run: pnpm test
 
@@ -48,3 +51,6 @@ jobs:
         env:
           TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
           TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+
+      - name: E2E
+        run: pnpm test:e2e
