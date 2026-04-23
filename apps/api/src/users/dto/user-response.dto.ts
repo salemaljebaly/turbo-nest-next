@@ -1,4 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
+import type { user } from '@repo/db';
+
+export type UserRecord = typeof user.$inferSelect;
 
 export class UserResponseDto {
   @ApiProperty()
@@ -22,15 +25,15 @@ export class UserResponseDto {
   @ApiProperty()
   updatedAt!: Date;
 
-  static from(user: Record<string, unknown>): UserResponseDto {
+  static from(user: UserRecord): UserResponseDto {
     const dto = new UserResponseDto();
-    dto.id = user.id as string;
-    dto.name = user.name as string;
-    dto.email = user.email as string;
-    dto.emailVerified = user.emailVerified as boolean;
-    dto.image = (user.image as string) ?? null;
-    dto.createdAt = user.createdAt as Date;
-    dto.updatedAt = user.updatedAt as Date;
+    dto.id = user.id;
+    dto.name = user.name;
+    dto.email = user.email;
+    dto.emailVerified = user.emailVerified;
+    dto.image = user.image;
+    dto.createdAt = user.createdAt;
+    dto.updatedAt = user.updatedAt;
     return dto;
   }
 }
