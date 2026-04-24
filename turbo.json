@@ -1,6 +1,18 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
   "ui": "tui",
+  "globalEnv": [
+    "CI",
+    "DATABASE_URL",
+    "NEXT_PUBLIC_API_URL",
+    "NEXT_PUBLIC_AUTH_URL",
+    "PLAYWRIGHT_BASE_URL",
+    "QUEUE_PREFIX",
+    "REDIS_URL",
+    "SENTRY_DSN",
+    "SENTRY_ENVIRONMENT",
+    "SENTRY_RELEASE"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

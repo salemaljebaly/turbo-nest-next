@@ -20,9 +20,12 @@ class DatabaseProvider implements OnApplicationShutdown {
   readonly db: Database;
 
   constructor(config: ConfigService) {
-    this.connection = createDbConnection(
-      config.getOrThrow<string>('DATABASE_URL'),
-    );
+    this.connection = createDbConnection({
+      connectionString: config.getOrThrow<string>('DATABASE_URL'),
+      max: config.getOrThrow<number>('DB_POOL_MAX'),
+      idleTimeout: config.getOrThrow<number>('DB_IDLE_TIMEOUT'),
+      connectTimeout: config.getOrThrow<number>('DB_CONNECT_TIMEOUT'),
+    });
     this.db = this.connection.db;
   }
 

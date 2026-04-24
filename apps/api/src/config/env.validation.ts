@@ -10,6 +10,9 @@ const envSchema = z.object({
 
   // Database
   DATABASE_URL: z.url(),
+  DB_POOL_MAX: z.coerce.number().int().positive().default(10),
+  DB_IDLE_TIMEOUT: z.coerce.number().int().positive().default(20),
+  DB_CONNECT_TIMEOUT: z.coerce.number().int().positive().default(10),
 
   // Auth
   BETTER_AUTH_URL: z.url(),
@@ -17,6 +20,13 @@ const envSchema = z.object({
 
   // Redis (optional)
   REDIS_URL: z.string().optional(),
+
+  // Observability (optional)
+  SENTRY_DSN: z.string().optional(),
+  SENTRY_ENVIRONMENT: z.string().optional(),
+  SENTRY_RELEASE: z.string().optional(),
+  SENTRY_SAMPLE_RATE: z.coerce.number().min(0).max(1).default(1),
+  SENTRY_TRACES_SAMPLE_RATE: z.coerce.number().min(0).max(1).default(0),
 
   // Email (optional in dev)
   SMTP_HOST: z.string().optional(),

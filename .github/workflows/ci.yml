@@ -52,5 +52,8 @@ jobs:
           TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
           TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
 
+      - name: Docker images
+        run: pnpm docker:build
+
       - name: E2E
         run: pnpm test:e2e

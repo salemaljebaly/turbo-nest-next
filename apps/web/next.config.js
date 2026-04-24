@@ -15,6 +15,8 @@ const nextConfig = {
   // ── Standalone output (recommended for Docker deployments) ──────────────
   output: 'standalone',
 
+  allowedDevOrigins: ['127.0.0.1'],
+
   // ── Server-side packages that should not be bundled by Next.js ──────────
   // serverExternalPackages: ['@repo/db', 'better-auth'],
 

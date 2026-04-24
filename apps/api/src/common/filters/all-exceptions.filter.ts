@@ -6,12 +6,17 @@ import {
   HttpStatus,
   Logger,
 } from '@nestjs/common';
+import { noopObservability, type Observability } from '@repo/observability';
 import { Request, Response } from 'express';
 import type { RequestWithContext } from '../middleware/request-context.middleware.js';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger(AllExceptionsFilter.name);
+
+  constructor(
+    private readonly observability: Observability = noopObservability,
+  ) {}
 
   catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
@@ -46,6 +51,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
         `${request.method} ${request.url} → ${status} requestId=${requestId}`,
         exception instanceof Error ? exception.stack : String(exception),
       );
+      this.observability.captureException(exception, {
+        requestId,
+        method: request.method,
+        path: request.url,
+        statusCode: status,
+      });
     } else {
       this.logger.warn(
         `${request.method} ${request.url} → ${status}: ${normalizedMessage} requestId=${requestId}`,

@@ -1,10 +1,16 @@
 # Dependencies
 node_modules
+**/node_modules
 
 # Build outputs
 .next
+**/.next
 dist
+**/dist
 .turbo
+**/.turbo
+out
+build
 
 # Version control
 .git
@@ -33,3 +39,8 @@ docker/
 
 # Testing
 coverage
+**/coverage
+playwright-report
+**/playwright-report
+test-results
+**/test-results
