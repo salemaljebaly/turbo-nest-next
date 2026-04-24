@@ -119,6 +119,9 @@ importers:
       "@types/supertest":
         specifier: ^7.2.0
         version: 7.2.0
+      "@vercel/ncc":
+        specifier: ^0.38.4
+        version: 0.38.4
       "@vitest/coverage-v8":
         specifier: ^4.1.2
         version: 4.1.2(vitest@4.1.2(@opentelemetry/api@1.9.1)(@types/node@25.5.2)(msw@2.12.14(@types/node@25.5.2)(typescript@6.0.2))(vite@7.3.1(@types/node@25.5.2)(jiti@2.6.1)(lightningcss@1.32.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3)))
@@ -4683,6 +4686,13 @@ packages:
         integrity: sha512-XJ9UD9+bbDo4a4epraTwG3TsNPeiB9aShrUneAVXy8q4LuwowN+qu89/6ByLMINqvIMeI9H9hOHQtg/ijrYXzQ==,
       }
     engines: { node: ^18.18.0 || ^20.9.0 || >=21.1.0 }
+
+  "@vercel/ncc@0.38.4":
+    resolution:
+      {
+        integrity: sha512-8LwjnlP39s08C08J5NstzriPvW1SP8Zfpp1BvC2sI35kPeZnHfxVkCwu4/+Wodgnd60UtT1n8K8zw+Mp7J9JmQ==,
+      }
+    hasBin: true
 
   "@vitest/coverage-v8@4.1.2":
     resolution:
@@ -12913,6 +12923,8 @@ snapshots:
     dependencies:
       "@typescript-eslint/types": 8.58.0
       eslint-visitor-keys: 5.0.1
+
+  "@vercel/ncc@0.38.4": {}
 
   "@vitest/coverage-v8@4.1.2(vitest@4.1.2(@opentelemetry/api@1.9.1)(@types/node@25.5.2)(msw@2.12.14(@types/node@25.5.2)(typescript@6.0.2))(vite@7.3.1(@types/node@25.5.2)(jiti@2.6.1)(lightningcss@1.32.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3)))":
     dependencies:

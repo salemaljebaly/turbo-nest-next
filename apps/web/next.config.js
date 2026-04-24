@@ -15,6 +15,10 @@ const nextConfig = {
   // ── Standalone output (recommended for Docker deployments) ──────────────
   output: 'standalone',
 
+  images: {
+    unoptimized: true,
+  },
+
   allowedDevOrigins: ['127.0.0.1'],
 
   // ── Server-side packages that should not be bundled by Next.js ──────────
