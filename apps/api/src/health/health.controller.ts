@@ -1,10 +1,12 @@
 import { Controller, Get } from '@nestjs/common';
 import { HealthCheck, HealthCheckService } from '@nestjs/terminus';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { SkipApiEnvelope } from '../common/decorators/api-envelope.decorator.js';
 import { DrizzleHealthIndicator } from './drizzle.health.js';
 import { RedisHealthIndicator } from './redis.health.js';
 
 @ApiTags('health')
+@SkipApiEnvelope()
 @Controller('health')
 export class HealthController {
   constructor(

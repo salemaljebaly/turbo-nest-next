@@ -10,7 +10,7 @@ import {
   ArrowRight,
   ExternalLink,
 } from "lucide-react";
-import { buttonVariants } from "@repo/ui/button-variants";
+import { buttonVariants } from "@/components/ui/button-variants";
 import { Badge } from "@/components/ui/badge";
 import { Navbar } from "@/components/navbar";
 

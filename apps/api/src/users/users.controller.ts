@@ -1,11 +1,8 @@
-import {
-  Controller,
-  Get,
-  UseGuards,
-  Req,
-} from '@nestjs/common';
+import { Controller, Get, UseGuards, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiEnvelopeOkResponse } from '../common/decorators/api-envelope.decorator.js';
 import { UsersService } from './users.service.js';
+import { UserResponseDto } from './dto/user-response.dto.js';
 import { AuthGuard, type SessionRequest } from '../auth/auth.guard.js';
 
 /**
@@ -25,8 +22,11 @@ export class UsersController {
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get the current authenticated user record' })
+  @ApiEnvelopeOkResponse(UserResponseDto, {
+    description:
+      'Current authenticated user wrapped in the standard API envelope',
+  })
   async me(@Req() req: SessionRequest) {
-    const data = await this.usersService.findCurrentUser(req.session.user.id);
-    return { success: true, data };
+    return this.usersService.findCurrentUser(req.session.user.id);
   }
 }

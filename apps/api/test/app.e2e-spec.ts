@@ -30,6 +30,14 @@ describe('AppController (e2e)', () => {
         ...process.env,
         PORT: String(PORT),
         NODE_ENV: 'test',
+        DATABASE_URL:
+          process.env['DATABASE_URL'] ??
+          'postgresql://postgres:postgres@localhost:5432/appdb',
+        BETTER_AUTH_URL: process.env['BETTER_AUTH_URL'] ?? BASE_URL,
+        BETTER_AUTH_SECRET:
+          process.env['BETTER_AUTH_SECRET'] ??
+          'e2e-test-secret-that-is-at-least-32-chars',
+        APP_URL: process.env['APP_URL'] ?? 'http://localhost:3000',
       },
       stdio: 'pipe',
     });
@@ -56,10 +64,36 @@ describe('AppController (e2e)', () => {
     }
   });
 
-  it('GET /api should return 200', async () => {
-    const response = await fetch(`${BASE_URL}/api`);
+  it('GET /api should return the standard envelope and request id', async () => {
+    const requestId = 'test-request-id';
+    const response = await fetch(`${BASE_URL}/api`, {
+      headers: { 'x-request-id': requestId },
+    });
 
     expect(response.status).toBe(200);
-    await expect(response.text()).resolves.toContain('Hello from');
+    expect(response.headers.get('x-request-id')).toBe(requestId);
+    await expect(response.json()).resolves.toMatchObject({
+      success: true,
+      data: {
+        message: expect.stringContaining('Hello from'),
+      },
+    });
+  });
+
+  it('GET /api/missing should return the standard error envelope and request id', async () => {
+    const requestId = 'missing-request-id';
+    const response = await fetch(`${BASE_URL}/api/missing`, {
+      headers: { 'x-request-id': requestId },
+    });
+
+    expect(response.status).toBe(404);
+    expect(response.headers.get('x-request-id')).toBe(requestId);
+    await expect(response.json()).resolves.toMatchObject({
+      success: false,
+      error: {
+        requestId,
+        path: '/api/missing',
+      },
+    });
   });
 });

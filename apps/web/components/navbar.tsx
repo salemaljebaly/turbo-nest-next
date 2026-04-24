@@ -1,20 +1,24 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Zap, LogOut, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { signOut, useSession } from "@/lib/auth/client";
 
+const subscribeToClientMount = () => () => {};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
+
 export function Navbar() {
   const { data: session, isPending } = useSession();
   const router = useRouter();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(
+    subscribeToClientMount,
+    getClientSnapshot,
+    getServerSnapshot,
+  );
 
   async function handleSignOut() {
     await signOut({
