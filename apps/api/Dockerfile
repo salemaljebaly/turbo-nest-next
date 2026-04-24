@@ -29,8 +29,7 @@ FROM deps AS build
 COPY . .
 RUN pnpm --filter=@repo/db build && \
     pnpm --filter=@repo/api build
-# Prune dev dependencies after build
-RUN CI=true pnpm prune --prod --ignore-scripts
+RUN CI=true pnpm --filter=@repo/api deploy --prod --legacy /prod/api --ignore-scripts
 
 # --- Production ---
 FROM base AS runner
@@ -41,20 +40,7 @@ LABEL org.opencontainers.image.description="turbo-nest-next API"
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nestjs
 
-COPY --from=build --chown=nestjs:nodejs /app/node_modules ./node_modules
-COPY --from=build --chown=nestjs:nodejs /app/apps/api/node_modules ./apps/api/node_modules
-COPY --from=build --chown=nestjs:nodejs /app/packages/db/node_modules ./packages/db/node_modules
-COPY --from=build --chown=nestjs:nodejs /app/packages/observability/node_modules ./packages/observability/node_modules
-COPY --from=build --chown=nestjs:nodejs /app/packages/types/node_modules ./packages/types/node_modules
-COPY --from=build --chown=nestjs:nodejs /app/apps/api/dist ./apps/api/dist
-COPY --from=build --chown=nestjs:nodejs /app/packages/db/dist ./packages/db/dist
-COPY --from=build --chown=nestjs:nodejs /app/packages/observability/dist ./packages/observability/dist
-COPY --from=build --chown=nestjs:nodejs /app/packages/types/src ./packages/types/src
-COPY --from=build --chown=nestjs:nodejs /app/apps/api/package.json ./apps/api/package.json
-COPY --from=build --chown=nestjs:nodejs /app/packages/db/package.json ./packages/db/package.json
-COPY --from=build --chown=nestjs:nodejs /app/packages/observability/package.json ./packages/observability/package.json
-COPY --from=build --chown=nestjs:nodejs /app/packages/types/package.json ./packages/types/package.json
-COPY --from=build --chown=nestjs:nodejs /app/package.json /app/pnpm-workspace.yaml ./
+COPY --from=build --chown=nestjs:nodejs /prod/api ./
 
 USER nestjs
 EXPOSE 3001
@@ -62,4 +48,4 @@ EXPOSE 3001
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3001/api/health || exit 1
 
-CMD ["node", "apps/api/dist/main"]
+CMD ["node", "dist/main"]
