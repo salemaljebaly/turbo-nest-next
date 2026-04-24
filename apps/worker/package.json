@@ -1,0 +1,29 @@
+{
+  "name": "@repo/worker",
+  "version": "0.0.1",
+  "description": "Optional background worker process",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "prebuild": "pnpm --filter=@repo/jobs build",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/main.js",
+    "preworker:dev": "pnpm --filter=@repo/jobs build",
+    "worker:dev": "tsx watch src/main.ts",
+    "precheck-types": "pnpm --filter=@repo/jobs build",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src --max-warnings 0"
+  },
+  "dependencies": {
+    "@repo/jobs": "workspace:*",
+    "dotenv": "^17.4.1"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^25.5.2",
+    "eslint": "^10.2.0",
+    "tsx": "^4.21.0",
+    "typescript": "6.0.2"
+  }
+}

@@ -7,6 +7,8 @@
     "start": "turbo run start",
     "api:dev": "pnpm --filter=@repo/api dev",
     "web:dev": "pnpm --filter=@repo/web dev",
+    "worker:dev": "pnpm --filter=@repo/worker worker:dev",
+    "worker:start": "pnpm --filter=@repo/worker start",
     "api:start:prod": "pnpm --filter=@repo/api start:prod",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\" --ignore-path .gitignore",
