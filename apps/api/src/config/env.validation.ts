@@ -10,6 +10,9 @@ const envSchema = z.object({
 
   // Database
   DATABASE_URL: z.url(),
+  DB_POOL_MAX: z.coerce.number().int().positive().default(10),
+  DB_IDLE_TIMEOUT: z.coerce.number().int().positive().default(20),
+  DB_CONNECT_TIMEOUT: z.coerce.number().int().positive().default(10),
 
   // Auth
   BETTER_AUTH_URL: z.url(),

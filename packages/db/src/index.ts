@@ -22,16 +22,29 @@ export {
 export type Database = ReturnType<typeof createDb>;
 export type DatabaseConnection = ReturnType<typeof createDbConnection>;
 
+export interface CreateDbConnectionOptions {
+  connectionString?: string;
+  max?: number;
+  idleTimeout?: number;
+  connectTimeout?: number;
+  prepare?: boolean;
+}
+
 /**
  * Create a database connection. Call once at app startup and reuse.
  * Throws immediately if DATABASE_URL is missing, not at module load time.
  */
-export function createDbConnection(connectionString?: string) {
-  const url = connectionString ?? process.env["DATABASE_URL"];
+export function createDbConnection(options: CreateDbConnectionOptions = {}) {
+  const url = options.connectionString ?? process.env["DATABASE_URL"];
   if (!url) {
     throw new Error("DATABASE_URL environment variable is required");
   }
-  const client = postgres(url);
+  const client = postgres(url, {
+    max: options.max,
+    idle_timeout: options.idleTimeout,
+    connect_timeout: options.connectTimeout,
+    prepare: options.prepare,
+  });
   const db = drizzle(client, {
     schema,
     logger: process.env["NODE_ENV"] === "development",
@@ -49,5 +62,5 @@ export function createDbConnection(connectionString?: string) {
  * Prefer createDbConnection when the host app can own shutdown lifecycle.
  */
 export function createDb(connectionString?: string) {
-  return createDbConnection(connectionString).db;
+  return createDbConnection({ connectionString }).db;
 }
