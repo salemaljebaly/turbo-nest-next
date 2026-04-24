@@ -21,6 +21,13 @@ const envSchema = z.object({
   // Redis (optional)
   REDIS_URL: z.string().optional(),
 
+  // Observability (optional)
+  SENTRY_DSN: z.string().optional(),
+  SENTRY_ENVIRONMENT: z.string().optional(),
+  SENTRY_RELEASE: z.string().optional(),
+  SENTRY_SAMPLE_RATE: z.coerce.number().min(0).max(1).default(1),
+  SENTRY_TRACES_SAMPLE_RATE: z.coerce.number().min(0).max(1).default(0),
+
   // Email (optional in dev)
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: z.coerce.number().optional(),
