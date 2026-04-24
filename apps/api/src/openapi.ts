@@ -1,8 +1,6 @@
 import { writeFile, mkdir } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module.js';
-import { configureApp, createOpenApiDocument } from './app.setup.js';
 
 process.env['DATABASE_URL'] ??=
   'postgresql://postgres:postgres@localhost:5432/appdb';
@@ -12,6 +10,9 @@ process.env['BETTER_AUTH_SECRET'] ??=
 process.env['APP_URL'] ??= 'http://localhost:3000';
 
 async function generateOpenApi() {
+  const [{ AppModule }, { configureApp, createOpenApiDocument }] =
+    await Promise.all([import('./app.module.js'), import('./app.setup.js')]);
+
   const app = await NestFactory.create(AppModule, { logger: false });
 
   configureApp(app);
@@ -24,4 +25,7 @@ async function generateOpenApi() {
   await app.close();
 }
 
-void generateOpenApi();
+generateOpenApi().catch((error: unknown) => {
+  console.error(error);
+  process.exitCode = 1;
+});
