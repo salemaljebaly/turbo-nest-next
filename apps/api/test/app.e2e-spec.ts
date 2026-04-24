@@ -30,6 +30,14 @@ describe('AppController (e2e)', () => {
         ...process.env,
         PORT: String(PORT),
         NODE_ENV: 'test',
+        DATABASE_URL:
+          process.env['DATABASE_URL'] ??
+          'postgresql://postgres:postgres@localhost:5432/appdb',
+        BETTER_AUTH_URL: process.env['BETTER_AUTH_URL'] ?? BASE_URL,
+        BETTER_AUTH_SECRET:
+          process.env['BETTER_AUTH_SECRET'] ??
+          'e2e-test-secret-that-is-at-least-32-chars',
+        APP_URL: process.env['APP_URL'] ?? 'http://localhost:3000',
       },
       stdio: 'pipe',
     });
