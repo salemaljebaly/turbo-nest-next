@@ -30,7 +30,7 @@ COPY . .
 RUN pnpm --filter=@repo/db build && \
     pnpm --filter=@repo/api build
 # Prune dev dependencies after build
-RUN CI=true pnpm prune --prod
+RUN CI=true pnpm prune --prod --ignore-scripts
 
 # --- Production ---
 FROM base AS runner
