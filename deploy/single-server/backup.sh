@@ -25,6 +25,8 @@ set +a
 : "${BACKUP_S3_ACCESS_KEY:?BACKUP_S3_ACCESS_KEY is required}"
 : "${BACKUP_S3_SECRET_KEY:?BACKUP_S3_SECRET_KEY is required}"
 : "${BACKUP_RETENTION_DAYS:=7}"
+: "${RUSTFS_ACCESS_KEY:=}"
+: "${RUSTFS_SECRET_KEY:=}"
 
 stamp="$(date -u +%Y%m%d-%H%M%S)"
 backup_dir="$BACKUP_DIR/$stamp"
@@ -46,20 +48,40 @@ docker run --rm \
   "s3://$BACKUP_S3_BUCKET/$BACKUP_S3_PREFIX/postgres/postgres-$stamp.dump" \
   --endpoint-url "$BACKUP_S3_ENDPOINT"
 
-if [ -n "${MINIO_BUCKET:-}" ]; then
-  echo "Mirroring MinIO bucket $MINIO_BUCKET..."
-  docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" exec -T \
-    -e BACKUP_S3_ENDPOINT="$BACKUP_S3_ENDPOINT" \
-    -e BACKUP_S3_ACCESS_KEY="$BACKUP_S3_ACCESS_KEY" \
-    -e BACKUP_S3_SECRET_KEY="$BACKUP_S3_SECRET_KEY" \
-    -e BACKUP_S3_BUCKET="$BACKUP_S3_BUCKET" \
-    -e BACKUP_S3_PREFIX="$BACKUP_S3_PREFIX" \
-    -e MINIO_BUCKET="$MINIO_BUCKET" \
-    minio sh -eu -c '
-      mc alias set local http://127.0.0.1:9000 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD" >/dev/null
-      mc alias set backup "$BACKUP_S3_ENDPOINT" "$BACKUP_S3_ACCESS_KEY" "$BACKUP_S3_SECRET_KEY" --api S3v4 >/dev/null
-      mc mirror --overwrite "local/$MINIO_BUCKET" "backup/$BACKUP_S3_BUCKET/$BACKUP_S3_PREFIX/minio/$MINIO_BUCKET"
-    '
+if [ -n "${RUSTFS_BUCKET:-}" ]; then
+  : "${RUSTFS_ACCESS_KEY:?RUSTFS_ACCESS_KEY is required when RUSTFS_BUCKET is set}"
+  : "${RUSTFS_SECRET_KEY:?RUSTFS_SECRET_KEY is required when RUSTFS_BUCKET is set}"
+
+  rustfs_container="$(docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps -q rustfs)"
+  if [ -z "$rustfs_container" ]; then
+    echo "RustFS container is not running"
+    exit 1
+  fi
+
+  rustfs_backup_dir="$backup_dir/rustfs/$RUSTFS_BUCKET"
+  mkdir -p "$rustfs_backup_dir"
+
+  echo "Downloading RustFS bucket $RUSTFS_BUCKET..."
+  docker run --rm \
+    --network "container:$rustfs_container" \
+    -e AWS_ACCESS_KEY_ID="$RUSTFS_ACCESS_KEY" \
+    -e AWS_SECRET_ACCESS_KEY="$RUSTFS_SECRET_KEY" \
+    -e AWS_DEFAULT_REGION="us-east-1" \
+    -v "$rustfs_backup_dir:/rustfs-bucket" \
+    amazon/aws-cli:2.32.3 \
+    s3 sync "s3://$RUSTFS_BUCKET" "/rustfs-bucket" \
+    --endpoint-url "http://127.0.0.1:9000"
+
+  echo "Uploading RustFS bucket mirror..."
+  docker run --rm \
+    -e AWS_ACCESS_KEY_ID="$BACKUP_S3_ACCESS_KEY" \
+    -e AWS_SECRET_ACCESS_KEY="$BACKUP_S3_SECRET_KEY" \
+    -e AWS_DEFAULT_REGION="$BACKUP_S3_REGION" \
+    -v "$rustfs_backup_dir:/rustfs-bucket:ro" \
+    amazon/aws-cli:2.32.3 \
+    s3 sync "/rustfs-bucket" \
+    "s3://$BACKUP_S3_BUCKET/$BACKUP_S3_PREFIX/rustfs/$RUSTFS_BUCKET" \
+    --endpoint-url "$BACKUP_S3_ENDPOINT"
 fi
 
 if [ "$BACKUP_RETENTION_DAYS" -gt 0 ] 2>/dev/null; then

@@ -68,7 +68,7 @@ const FEATURES = [
     icon: Container,
     title: "Docker Compose",
     description:
-      "Postgres, Redis, MinIO, and MailHog preconfigured. One `docker compose up` and you're running.",
+      "Postgres, Redis, RustFS, and MailHog preconfigured. One `docker compose up` and you're running.",
   },
   {
     icon: BookOpen,
