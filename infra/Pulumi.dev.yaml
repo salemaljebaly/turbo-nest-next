@@ -1,0 +1,5 @@
+config:
+  turbo-nest-next:sshPublicKey: "ssh-ed25519 AAAA... replace-me"
+  turbo-nest-next:serverType: cax21
+  turbo-nest-next:location: nbg1
+  turbo-nest-next:cloudflareProxied: false

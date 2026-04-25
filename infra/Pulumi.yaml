@@ -1,0 +1,8 @@
+name: turbo-nest-next
+runtime:
+  name: nodejs
+  options:
+    typescript: true
+description: Single-server infrastructure on Hetzner Cloud with Cloudflare DNS
+backend:
+  url: file://~

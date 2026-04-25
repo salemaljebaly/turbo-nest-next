@@ -127,6 +127,7 @@ Short guides:
 - [shadcn presets](./docs/shadcn.md)
 - [Single-server containers](./docs/single-server.md)
 - [S3 backups](./docs/backups.md)
+- [Pulumi single-server infra](./infra/README.md)
 
 ### Add a new feature module to the API
 
