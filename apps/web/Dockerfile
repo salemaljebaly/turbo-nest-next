@@ -9,6 +9,11 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN corepack enable && corepack prepare pnpm@10.33.0 --activate
 WORKDIR /app
 
+# --- Stripped Node runtime ---
+FROM alpine:3.22 AS node-runtime
+COPY --from=base /usr/local/bin/node /usr/local/bin/node
+RUN apk add --no-cache binutils && strip /usr/local/bin/node
+
 # --- Dependencies ---
 FROM base AS deps
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json .npmrc ./
@@ -28,16 +33,24 @@ RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
 # --- Build ---
 FROM deps AS build
 COPY . .
-RUN pnpm --filter=@repo/web build
+RUN pnpm --filter=@repo/web build && \
+    rm -rf /app/apps/web/.next/standalone/node_modules/.pnpm/sharp@* \
+      /app/apps/web/.next/standalone/node_modules/.pnpm/@img+sharp-* \
+      /app/apps/web/.next/standalone/node_modules/.pnpm/@img+colour@*
 
 # --- Production ---
-FROM base AS runner
+FROM alpine:3.22 AS runner
 ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 LABEL org.opencontainers.image.source="https://github.com/salemaljebaly/turbo-nest-next"
 LABEL org.opencontainers.image.description="turbo-nest-next Web"
+WORKDIR /app
 
-RUN addgroup --system --gid 1001 nodejs && \
+RUN apk add --no-cache libstdc++ && \
+    addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
+
+COPY --from=node-runtime /usr/local/bin/node /usr/local/bin/node
 
 # Next.js standalone output includes only what's needed
 COPY --from=build --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public

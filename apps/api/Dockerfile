@@ -8,6 +8,11 @@ ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable && corepack prepare pnpm@10.33.0 --activate
 WORKDIR /app
 
+# --- Stripped Node runtime ---
+FROM alpine:3.22 AS node-runtime
+COPY --from=base /usr/local/bin/node /usr/local/bin/node
+RUN apk add --no-cache binutils && strip /usr/local/bin/node
+
 # --- Dependencies ---
 FROM base AS deps
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json .npmrc ./
@@ -29,18 +34,21 @@ FROM deps AS build
 COPY . .
 RUN pnpm --filter=@repo/db build && \
     pnpm --filter=@repo/api build
-RUN CI=true pnpm --filter=@repo/api deploy --prod --legacy /prod/api --ignore-scripts
+RUN pnpm --filter=@repo/api bundle
 
 # --- Production ---
-FROM base AS runner
+FROM alpine:3.22 AS runner
 ENV NODE_ENV=production
 LABEL org.opencontainers.image.source="https://github.com/salemaljebaly/turbo-nest-next"
 LABEL org.opencontainers.image.description="turbo-nest-next API"
+WORKDIR /app
 
-RUN addgroup --system --gid 1001 nodejs && \
+RUN apk add --no-cache libstdc++ && \
+    addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nestjs
 
-COPY --from=build --chown=nestjs:nodejs /prod/api ./
+COPY --from=node-runtime /usr/local/bin/node /usr/local/bin/node
+COPY --from=build --chown=nestjs:nodejs /app/apps/api/dist-bundle ./
 
 USER nestjs
 EXPOSE 3001
@@ -48,4 +56,4 @@ EXPOSE 3001
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3001/api/health || exit 1
 
-CMD ["node", "dist/main"]
+CMD ["node", "index.js"]

@@ -10,8 +10,15 @@ import {
   ArrowRight,
   ExternalLink,
 } from "lucide-react";
-import { buttonVariants } from "@/components/ui/button-variants";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Navbar } from "@/components/navbar";
 
 export const metadata: Metadata = {
@@ -79,74 +86,94 @@ export default function Home() {
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
 
-      {/* Hero */}
-      <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 pt-14">
-        {/* Subtle grid background */}
+      <section className="relative flex min-h-screen flex-col overflow-hidden px-6 pt-24">
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.03]"
+          className="pointer-events-none absolute inset-0 opacity-[0.04]"
           style={{
             backgroundImage:
               "linear-gradient(var(--foreground) 1px, transparent 1px), linear-gradient(90deg, var(--foreground) 1px, transparent 1px)",
-            backgroundSize: "72px 72px",
+            backgroundSize: "80px 80px",
           }}
         />
-        {/* Radial fade over grid */}
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_50%,transparent_40%,var(--background)_100%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_45%_at_50%_24%,transparent_24%,var(--background)_78%)]" />
 
-        <div className="relative z-10 mx-auto max-w-3xl text-center">
-          <div className="mb-6 flex justify-center">
-            <Badge variant="outline" className="gap-1.5 px-3 py-1 text-xs">
-              <span className="size-1.5 rounded-full bg-primary animate-pulse inline-block" />
+        <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col justify-center gap-12 py-14">
+          <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
+            <Badge variant="outline" className="mb-6 gap-2">
+              <span className="inline-block size-1.5 rounded-full bg-primary" />
               Production-ready template
             </Badge>
+
+            <h1 className="max-w-3xl text-5xl font-semibold tracking-tight text-balance sm:text-6xl lg:text-7xl">
+              Full-stack monorepo for products that need room to scale.
+            </h1>
+
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground text-balance">
+              NestJS, Next.js, Better Auth, Drizzle, queues, typed API
+              contracts, and deployment-ready Docker images in one reusable
+              template.
+            </p>
+
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+              <Button asChild size="lg">
+                <Link href="/sign-up">
+                  Get started
+                  <ArrowRight data-icon="inline-end" />
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline">
+                <a
+                  href={`${API_URL}/docs`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  API docs
+                  <ExternalLink data-icon="inline-end" />
+                </a>
+              </Button>
+            </div>
           </div>
 
-          <h1 className="mb-6 text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
-            <span className="bg-gradient-to-b from-foreground to-foreground/50 bg-clip-text text-transparent">
-              Production-ready
-              <br />
-              full-stack monorepo
-            </span>
-          </h1>
-
-          <p className="mb-10 max-w-xl mx-auto text-lg text-muted-foreground leading-relaxed">
-            Ship your next project with NestJS, Next.js, Better Auth, and
-            Drizzle — everything wired together so you can focus on your
-            product.
-          </p>
-
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <Link href="/sign-up" className={buttonVariants({ size: "lg" })}>
-              Get started
-              <ArrowRight className="size-4" />
-            </Link>
-            <a
-              href={`${API_URL}/docs`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={buttonVariants({ size: "lg", variant: "outline" })}
-            >
-              API docs
-              <ExternalLink className="size-4" />
-            </a>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <Card size="sm">
+              <CardHeader>
+                <CardTitle>API first</CardTitle>
+                <CardDescription>
+                  OpenAPI output and generated frontend types keep teams aligned
+                  before runtime.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            <Card size="sm">
+              <CardHeader>
+                <CardTitle>Stateless core</CardTitle>
+                <CardDescription>
+                  The API can scale horizontally, while queues stay optional for
+                  bursty work.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            <Card size="sm">
+              <CardHeader>
+                <CardTitle>Lean deploys</CardTitle>
+                <CardDescription>
+                  Production Docker images ship runtime artifacts, not the whole
+                  workspace.
+                </CardDescription>
+              </CardHeader>
+            </Card>
           </div>
-        </div>
-
-        {/* Scroll hint */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 text-muted-foreground/50">
-          <div className="h-6 w-px bg-gradient-to-b from-transparent to-muted-foreground/30" />
         </div>
       </section>
 
-      {/* Tech stack */}
       <section className="border-y border-border/50 bg-muted/30 px-6 py-10">
         <div className="mx-auto max-w-6xl">
-          <p className="mb-6 text-center text-xs font-medium uppercase tracking-widest text-muted-foreground">
+          <p className="mb-6 text-center text-xs font-medium uppercase text-muted-foreground">
             Built with
           </p>
           <div className="flex flex-wrap justify-center gap-2">
             {STACK.map((tech) => (
-              <Badge key={tech} variant="outline" className="text-xs">
+              <Badge key={tech} variant="outline">
                 {tech}
               </Badge>
             ))}
@@ -154,15 +181,14 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features */}
       <section className="px-6 py-24">
         <div className="mx-auto max-w-6xl">
           <div className="mb-16 text-center">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Everything you need.
+            <h2 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+              A practical foundation.
               <br />
-              <span className="text-muted-foreground font-normal">
-                Nothing you don&apos;t.
+              <span className="font-normal text-muted-foreground">
+                Small today, clean path to larger systems.
               </span>
             </h2>
           </div>
@@ -171,58 +197,62 @@ export default function Home() {
             {FEATURES.map((feature) => {
               const Icon = feature.icon;
               return (
-                <div
+                <Card
                   key={feature.title}
-                  className="group rounded-2xl border border-border/60 bg-card p-6 transition-all duration-200 hover:border-border hover:shadow-sm"
+                  className="transition-shadow hover:shadow-lg"
                 >
-                  <div className="mb-4 flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary/15">
-                    <Icon className="size-5" />
-                  </div>
-                  <h3 className="mb-2 font-semibold">{feature.title}</h3>
-                  <p className="text-sm leading-relaxed text-muted-foreground">
-                    {feature.description}
-                  </p>
-                </div>
+                  <CardHeader>
+                    <div className="mb-3 flex size-10 items-center justify-center rounded-4xl bg-muted text-foreground">
+                      <Icon className="size-5" />
+                    </div>
+                    <CardTitle>{feature.title}</CardTitle>
+                    <CardDescription>{feature.description}</CardDescription>
+                  </CardHeader>
+                </Card>
               );
             })}
           </div>
         </div>
       </section>
 
-      {/* CTA banner */}
       <section className="px-6 pb-24">
         <div className="mx-auto max-w-6xl">
-          <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card p-12 text-center">
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_50%_100%,var(--primary)/0.06,transparent)]" />
-            <h2 className="mb-3 text-3xl font-bold tracking-tight">
-              Start building today
-            </h2>
-            <p className="mb-8 text-muted-foreground">
-              Clone, install, and run — in under two minutes.
-            </p>
-            <div className="mb-8 inline-flex items-center rounded-xl border border-border bg-muted/50 px-5 py-2.5 font-mono text-sm text-foreground/70">
-              pnpm install && pnpm dev
-            </div>
-            <div className="flex flex-wrap justify-center gap-3">
-              <Link href="/sign-up" className={buttonVariants({ size: "lg" })}>
-                Create account
-                <ArrowRight className="size-4" />
-              </Link>
-              <a
-                href={`${API_URL}/health`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={buttonVariants({ size: "lg", variant: "outline" })}
-              >
-                Health check
-                <ExternalLink className="size-4" />
-              </a>
-            </div>
-          </div>
+          <Card>
+            <CardContent className="flex flex-col items-center gap-8 py-12 text-center">
+              <div>
+                <h2 className="text-3xl font-semibold tracking-tight">
+                  Start from a clean template.
+                </h2>
+                <p className="mt-3 text-muted-foreground">
+                  Clone, configure env, run infrastructure, and build.
+                </p>
+              </div>
+              <code className="inline-flex border border-border bg-background px-4 py-2 font-mono text-sm text-foreground">
+                pnpm install && pnpm dev
+              </code>
+              <div className="flex flex-wrap justify-center gap-3">
+                <Button asChild size="lg">
+                  <Link href="/sign-up">
+                    Create account
+                    <ArrowRight data-icon="inline-end" />
+                  </Link>
+                </Button>
+                <Button asChild size="lg" variant="outline">
+                  <a
+                    href={`${API_URL}/health`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Health check
+                    <ExternalLink data-icon="inline-end" />
+                  </a>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="border-t border-border/50 px-6 py-8">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
