@@ -1,5 +1,13 @@
 import { defineConfig, devices } from "@playwright/test";
 
+declare global {
+  var E2E_TEST_EMAIL: string | undefined;
+  var E2E_TEST_PASSWORD: string | undefined;
+}
+
+globalThis.E2E_TEST_EMAIL = process.env.E2E_TEST_EMAIL;
+globalThis.E2E_TEST_PASSWORD = process.env.E2E_TEST_PASSWORD;
+
 export default defineConfig({
   testDir: "./e2e",
   testMatch: "**/*.pw.ts",
