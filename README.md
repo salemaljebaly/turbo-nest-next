@@ -125,6 +125,7 @@ Short guides:
 - [Architecture](./docs/architecture.md)
 - [Scaling path](./docs/scaling.md)
 - [shadcn presets](./docs/shadcn.md)
+- [Sentry](./docs/sentry.md)
 
 ### Add a new feature module to the API
 
