@@ -44,6 +44,14 @@ set -a && source tests/k6/.env.k6 && set +a
 | Load     | `pnpm stress:load`   | moderate mixed traffic baseline              |
 | Stress   | `pnpm stress:stress` | aggressive ramp to find the breaking point   |
 
+When the scenarios are already built, you can run k6 directly from the root:
+
+```bash
+pnpm test:k6:smoke
+pnpm test:k6:load
+pnpm test:k6:stress
+```
+
 Reports are written to `tests/k6/dist`:
 
 - `report-*.html`
@@ -53,6 +61,7 @@ Reports are written to `tests/k6/dist`:
 
 - public landing page
 - API health endpoint
+- invalid auth request handling
 - authenticated API endpoint when test credentials are configured
 
 Add file upload/download scenarios after storage flows are added to the app.
