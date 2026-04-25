@@ -1,8 +1,9 @@
-import { Controller, Get, UseGuards, Req } from '@nestjs/common';
+import { Body, Controller, Get, Patch, UseGuards, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { ApiEnvelopeOkResponse } from '../common/decorators/api-envelope.decorator.js';
 import { UsersService } from './users.service.js';
 import { UserResponseDto } from './dto/user-response.dto.js';
+import { UpdateProfileDto } from './dto/update-profile.dto.js';
 import { AuthGuard, type SessionRequest } from '../auth/auth.guard.js';
 
 /**
@@ -28,5 +29,17 @@ export class UsersController {
   })
   async me(@Req() req: SessionRequest) {
     return this.usersService.findCurrentUser(req.session.user.id);
+  }
+
+  @Patch('me')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update the current user profile' })
+  @ApiEnvelopeOkResponse(UserResponseDto, {
+    description:
+      'Updated authenticated user wrapped in the standard API envelope',
+  })
+  async updateMe(@Req() req: SessionRequest, @Body() body: UpdateProfileDto) {
+    return this.usersService.updateUserProfile(req.session.user.id, body);
   }
 }
