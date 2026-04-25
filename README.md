@@ -121,8 +121,10 @@ pnpm dev
 
 Short guides:
 
+- [Before you start](./docs/before-you-start.md)
 - [Architecture](./docs/architecture.md)
 - [Scaling path](./docs/scaling.md)
+- [shadcn presets](./docs/shadcn.md)
 
 ### Add a new feature module to the API
 
