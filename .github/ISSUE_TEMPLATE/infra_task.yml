@@ -1,0 +1,46 @@
+name: Infrastructure task
+description: Track deployment, server, backup, storage, or load-test work.
+title: "infra: "
+labels: ["infrastructure"]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What infrastructure outcome should be achieved?
+    validations:
+      required: true
+  - type: dropdown
+    id: target
+    attributes:
+      label: Target
+      options:
+        - Local Docker
+        - Single server
+        - Medium deployment
+        - Backups
+        - Object storage
+        - Stress testing
+        - CI/CD
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: plan
+    attributes:
+      label: Proposed plan
+      description: Include commands, services, ports, secrets, and rollback notes.
+    validations:
+      required: true
+  - type: textarea
+    id: manual_steps
+    attributes:
+      label: Manual steps
+      description: List required DNS, server, Sentry, storage, or cloud-console actions.
+  - type: textarea
+    id: validation
+    attributes:
+      label: Validation
+      description: How will this be tested, including restore or smoke checks?
+    validations:
+      required: true
