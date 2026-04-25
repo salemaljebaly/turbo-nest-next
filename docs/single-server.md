@@ -11,7 +11,7 @@ as a container.
 - API: bundled NestJS image
 - Postgres 17
 - Redis 8
-- MinIO S3-compatible object storage
+- RustFS S3-compatible object storage
 - Worker: optional Compose profile
 
 ## Server Prerequisites
@@ -24,7 +24,7 @@ as a container.
   - `API_DOMAIN` -> server IP
 
 Only ports `22`, `80`, and `443` should be public. Do not expose Postgres,
-Redis, or MinIO directly.
+Redis, or RustFS directly.
 
 ## First Setup
 

@@ -107,7 +107,7 @@ The server uses the same validated backup pattern as the single-server backup
 task:
 
 - Postgres custom-format dump
-- MinIO bucket mirror
+- RustFS bucket mirror
 - S3-compatible remote
 - restore test required before considering backups complete
 

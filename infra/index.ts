@@ -16,8 +16,8 @@ const githubToken = process.env.GITHUB_TOKEN;
 const betterAuthSecret = process.env.BETTER_AUTH_SECRET;
 const postgresPassword = process.env.POSTGRES_PASSWORD;
 const redisPassword = process.env.REDIS_PASSWORD;
-const minioRootUser = process.env.MINIO_ROOT_USER;
-const minioRootPassword = process.env.MINIO_ROOT_PASSWORD;
+const rustfsAccessKey = process.env.RUSTFS_ACCESS_KEY;
+const rustfsSecretKey = process.env.RUSTFS_SECRET_KEY;
 
 if (!appDomain) throw new pulumi.RunError("APP_DOMAIN must be set in .env");
 if (!apiDomain) throw new pulumi.RunError("API_DOMAIN must be set in .env");
@@ -31,10 +31,10 @@ if (!postgresPassword)
   throw new pulumi.RunError("POSTGRES_PASSWORD must be set in .env");
 if (!redisPassword)
   throw new pulumi.RunError("REDIS_PASSWORD must be set in .env");
-if (!minioRootUser)
-  throw new pulumi.RunError("MINIO_ROOT_USER must be set in .env");
-if (!minioRootPassword)
-  throw new pulumi.RunError("MINIO_ROOT_PASSWORD must be set in .env");
+if (!rustfsAccessKey)
+  throw new pulumi.RunError("RUSTFS_ACCESS_KEY must be set in .env");
+if (!rustfsSecretKey)
+  throw new pulumi.RunError("RUSTFS_SECRET_KEY must be set in .env");
 
 const sshPublicKey = config.require("sshPublicKey");
 const serverType = config.get("serverType") ?? "cax21";
@@ -65,9 +65,9 @@ const userData = buildCloudInit({
   githubRef: process.env.GITHUB_REF,
   githubRepo,
   githubToken,
-  minioBucket: process.env.MINIO_BUCKET,
-  minioRootPassword,
-  minioRootUser,
+  rustfsAccessKey,
+  rustfsBucket: process.env.RUSTFS_BUCKET,
+  rustfsSecretKey,
   postgresPassword,
   redisPassword,
   sentryDsn: process.env.SENTRY_DSN,
