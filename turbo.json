@@ -11,6 +11,8 @@
     "REDIS_URL",
     "SENTRY_DSN",
     "SENTRY_ENVIRONMENT",
+    "SENTRY_ORG",
+    "SENTRY_PROJECT",
     "SENTRY_RELEASE"
   ],
   "tasks": {
