@@ -97,8 +97,8 @@ docker compose --env-file deploy/single-server/.env \
 
 ## Backups
 
-Backups are handled in the separate S3 backup task. At minimum, a production
-server needs:
+Use [S3 backups](./backups.md) for the single-server profile. At minimum, a
+production server needs:
 
 - Postgres dump backups
 - object storage backups
