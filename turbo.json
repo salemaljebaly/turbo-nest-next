@@ -4,6 +4,9 @@
   "globalEnv": [
     "CI",
     "DATABASE_URL",
+    "E2E_RUN_AUTH_FLOWS",
+    "E2E_TEST_EMAIL",
+    "E2E_TEST_PASSWORD",
     "NEXT_PUBLIC_API_URL",
     "NEXT_PUBLIC_AUTH_URL",
     "PLAYWRIGHT_BASE_URL",
