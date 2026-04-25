@@ -70,6 +70,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/jobs/ping": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Enqueue a template ping background job */
+    post: operations["JobsController_enqueuePing_v1"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -87,6 +104,14 @@ export interface components {
       createdAt: string;
       /** Format: date-time */
       updatedAt: string;
+    };
+    EnqueuePingJobResponseDto: {
+      queued: boolean;
+      message: string;
+    };
+    EnqueuePingJobDto: {
+      /** @example hello from the API */
+      message: string;
     };
   };
   responses: never;
@@ -378,6 +403,35 @@ export interface operations {
             /** @enum {boolean} */
             success: true;
             data: components["schemas"]["UserResponseDto"];
+            message?: string;
+          };
+        };
+      };
+    };
+  };
+  JobsController_enqueuePing_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["EnqueuePingJobDto"];
+      };
+    };
+    responses: {
+      /** @description Queued ping job wrapped in the standard API envelope */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {boolean} */
+            success: true;
+            data: components["schemas"]["EnqueuePingJobResponseDto"];
             message?: string;
           };
         };

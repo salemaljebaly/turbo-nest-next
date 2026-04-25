@@ -307,6 +307,54 @@
         "summary": "Get the current authenticated user record",
         "tags": ["users"]
       }
+    },
+    "/api/v1/jobs/ping": {
+      "post": {
+        "operationId": "JobsController_enqueuePing_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnqueuePingJobDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Queued ping job wrapped in the standard API envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["success", "data"],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [true]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/EnqueuePingJobResponseDto"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Enqueue a template ping background job",
+        "tags": ["jobs"]
+      }
     }
   },
   "info": {
@@ -371,6 +419,28 @@
           "createdAt",
           "updatedAt"
         ]
+      },
+      "EnqueuePingJobResponseDto": {
+        "type": "object",
+        "properties": {
+          "queued": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["queued", "message"]
+      },
+      "EnqueuePingJobDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "hello from the API"
+          }
+        },
+        "required": ["message"]
       }
     }
   }
