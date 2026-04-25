@@ -8,6 +8,13 @@
       "when": 1775483233237,
       "tag": "0000_supreme_kylun",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1777149629750,
+      "tag": "0001_complete_luke_cage",
+      "breakpoints": true
     }
   ]
 }
