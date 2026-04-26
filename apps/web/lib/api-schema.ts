@@ -70,6 +70,23 @@ export interface paths {
     patch: operations["AuthController_handleAuth_patch"];
     trace?: never;
   };
+  "/api/v1/users": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List users with cursor pagination */
+    get: operations["UsersController_list_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/users/me": {
     parameters: {
       query?: never;
@@ -104,6 +121,11 @@ export interface components {
       createdAt: string;
       /** Format: date-time */
       updatedAt: string;
+    };
+    UsersListResponseDto: {
+      items: components["schemas"]["UserResponseDto"][];
+      nextCursor: string | null;
+      hasMore: boolean;
     };
   };
   responses: never;
@@ -390,6 +412,36 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+    };
+  };
+  UsersController_list_v1: {
+    parameters: {
+      query?: {
+        /** @description Page size between 1 and 100 */
+        limit?: number;
+        /** @description Last user id from the previous page */
+        cursor?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Paginated users wrapped in the standard API envelope */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {boolean} */
+            success: true;
+            data: components["schemas"]["UsersListResponseDto"];
+            message?: string;
+          };
+        };
       };
     };
   };
