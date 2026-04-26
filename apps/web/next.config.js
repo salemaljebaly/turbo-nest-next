@@ -1,7 +1,9 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
+import path from "path";
+import process from "node:process";
+import { fileURLToPath } from "url";
+import { withSentryConfig } from "@sentry/nextjs";
 
-const __dirname = fileURLToPath(new URL('.', import.meta.url));
+const __dirname = fileURLToPath(new URL(".", import.meta.url));
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -9,17 +11,17 @@ const nextConfig = {
   // Explicitly set so Turbopack doesn't pick up a wrong lockfile higher up
   // the directory tree.
   turbopack: {
-    root: path.resolve(__dirname, '../..'),
+    root: path.resolve(__dirname, "../.."),
   },
 
   // ── Standalone output (recommended for Docker deployments) ──────────────
-  output: 'standalone',
+  output: "standalone",
 
   images: {
     unoptimized: true,
   },
 
-  allowedDevOrigins: ['127.0.0.1'],
+  allowedDevOrigins: ["127.0.0.1"],
 
   // ── Server-side packages that should not be bundled by Next.js ──────────
   // serverExternalPackages: ['@repo/db', 'better-auth'],
@@ -38,18 +40,28 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: '/(.*)',
+        source: "/(.*)",
         headers: [
-          { key: 'X-Frame-Options', value: 'DENY' },
-          { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-          { key: 'X-DNS-Prefetch-Control', value: 'on' },
-          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
-          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "X-DNS-Prefetch-Control", value: "on" },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains",
+          },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()",
+          },
         ],
       },
     ];
   },
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  silent: true,
+});

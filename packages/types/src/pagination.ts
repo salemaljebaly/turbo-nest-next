@@ -1,13 +1,20 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const PaginationQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
   sortBy: z.string().optional(),
-  sortOrder: z.enum(['asc', 'desc']).default('desc'),
+  sortOrder: z.enum(["asc", "desc"]).default("desc"),
 });
 
 export type PaginationQuery = z.infer<typeof PaginationQuerySchema>;
+
+export const CursorPaginationQuerySchema = z.object({
+  cursor: z.string().optional(),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+});
+
+export type CursorPaginationQuery = z.infer<typeof CursorPaginationQuerySchema>;
 
 export const PaginatedResponseSchema = <T extends z.ZodType>(itemSchema: T) =>
   z.object({
@@ -28,4 +35,21 @@ export type PaginatedResponse<T> = {
     limit: number;
     totalPages: number;
   };
+};
+
+export const CursorPaginatedResponseSchema = <T extends z.ZodType>(
+  itemSchema: T,
+) =>
+  z.object({
+    items: z.array(itemSchema),
+    nextCursor: z.string().nullable(),
+    hasMore: z.boolean(),
+    total: z.number().int().optional(),
+  });
+
+export type CursorPaginatedResponse<T> = {
+  items: T[];
+  nextCursor: string | null;
+  hasMore: boolean;
+  total?: number;
 };

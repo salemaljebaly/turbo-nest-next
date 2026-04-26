@@ -20,6 +20,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/observability/sentry-smoke": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Manually trigger a Sentry smoke-test error when enabled */
+    get: operations["SentrySmokeController_triggerSentrySmoke_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/health": {
     parameters: {
       query?: never;
@@ -51,6 +68,23 @@ export interface paths {
     options: operations["AuthController_handleAuth_options"];
     head: operations["AuthController_handleAuth_head"];
     patch: operations["AuthController_handleAuth_patch"];
+    trace?: never;
+  };
+  "/api/v1/users": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List users with cursor pagination */
+    get: operations["UsersController_list_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
     trace?: never;
   };
   "/api/v1/users/me": {
@@ -144,6 +178,23 @@ export interface operations {
             message?: string;
           };
         };
+      };
+    };
+  };
+  SentrySmokeController_triggerSentrySmoke_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };
@@ -381,6 +432,36 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+    };
+  };
+  UsersController_list_v1: {
+    parameters: {
+      query?: {
+        /** @description Page size between 1 and 100 */
+        limit?: number;
+        /** @description Last user id from the previous page */
+        cursor?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Paginated users wrapped in the standard API envelope */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {boolean} */
+            success: true;
+            data: components["schemas"]["UsersListResponseDto"];
+            message?: string;
+          };
+        };
       };
     };
   };

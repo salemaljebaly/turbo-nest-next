@@ -33,6 +33,19 @@
         "tags": ["app"]
       }
     },
+    "/api/v1/observability/sentry-smoke": {
+      "get": {
+        "operationId": "SentrySmokeController_triggerSentrySmoke_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Manually trigger a Sentry smoke-test error when enabled",
+        "tags": ["observability"]
+      }
+    },
     "/api/health": {
       "get": {
         "operationId": "HealthController_check",
@@ -268,6 +281,63 @@
           }
         },
         "tags": ["Auth"]
+      }
+    },
+    "/api/v1/users": {
+      "get": {
+        "operationId": "UsersController_list_v1",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Page size between 1 and 100",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Last user id from the previous page",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated users wrapped in the standard API envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["success", "data"],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [true]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UsersListResponseDto"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List users with cursor pagination",
+        "tags": ["users"]
       }
     },
     "/api/v1/users/me": {
