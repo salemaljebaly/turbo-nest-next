@@ -128,6 +128,7 @@ Short guides:
 - [Stress testing](./docs/stress-testing.md)
 - [Single-server containers](./docs/single-server.md)
 - [S3 backups](./docs/backups.md)
+- [Pulumi single-server infra](./infra/README.md)
 - [Sentry](./docs/sentry.md)
 - [Git hooks](./docs/git-hooks.md)
 
