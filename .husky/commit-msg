@@ -1,0 +1,17 @@
+commit_msg_file="$1"
+commit_msg="$(sed -n '1p' "$commit_msg_file")"
+
+case "$commit_msg" in
+  Merge\ *|Revert\ *) exit 0 ;;
+esac
+
+if ! printf '%s' "$commit_msg" | grep -Eq '^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|infra)(\([a-z0-9._-]+\))?!?: .{1,120}$'; then
+  echo "Invalid commit message:"
+  echo "  $commit_msg"
+  echo
+  echo "Use Conventional Commits, for example:"
+  echo "  feat(api): add users endpoint"
+  echo "  fix(web): handle empty api response"
+  echo "  docs: update deployment guide"
+  exit 1
+fi

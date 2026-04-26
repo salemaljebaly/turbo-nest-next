@@ -1,0 +1,45 @@
+name: Feature request
+description: Propose a reusable template feature.
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What developer or product problem should this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: Describe the desired behavior or API.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - API
+        - Web
+        - Auth
+        - Database
+        - UI
+        - Testing
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: template_fit
+    attributes:
+      label: Template fit
+      description: Why does this belong in a reusable template instead of one app?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered

@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "deps:prepare": "pnpm --filter=@repo/db build && pnpm --filter=@repo/observability build",
+    "deps:prepare": "pnpm --filter=@repo/db build && pnpm --filter=@repo/observability build && pnpm --filter=@repo/types build",
     "db:prepare": "pnpm --filter=@repo/db build",
     "prebuild": "pnpm run deps:prepare",
     "build": "nest build",

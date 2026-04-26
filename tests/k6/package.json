@@ -1,0 +1,15 @@
+{
+  "name": "@repo/k6",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/smoke.ts src/load.ts src/stress.ts --bundle --outdir=dist --platform=browser --format=esm --external:k6 --external:k6/*",
+    "test:smoke": "pnpm build && K6_WEB_DASHBOARD=true K6_WEB_DASHBOARD_EXPORT=dist/report-smoke.html k6 run --out json=dist/report-smoke.json dist/smoke.js",
+    "test:load": "pnpm build && K6_WEB_DASHBOARD=true K6_WEB_DASHBOARD_EXPORT=dist/report-load.html k6 run --out json=dist/report-load.json dist/load.js",
+    "test:stress": "pnpm build && K6_WEB_DASHBOARD=true K6_WEB_DASHBOARD_EXPORT=dist/report-stress.html k6 run --out json=dist/report-stress.json dist/stress.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.12"
+  }
+}

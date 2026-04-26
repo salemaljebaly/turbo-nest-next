@@ -14,7 +14,10 @@
     "REDIS_URL",
     "SENTRY_DSN",
     "SENTRY_ENVIRONMENT",
-    "SENTRY_RELEASE"
+    "SENTRY_ORG",
+    "SENTRY_PROJECT",
+    "SENTRY_RELEASE",
+    "SENTRY_SMOKE_TEST_ENABLED"
   ],
   "tasks": {
     "build": {

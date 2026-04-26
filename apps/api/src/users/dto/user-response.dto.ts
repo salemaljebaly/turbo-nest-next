@@ -37,3 +37,14 @@ export class UserResponseDto {
     return dto;
   }
 }
+
+export class UsersListResponseDto {
+  @ApiProperty({ type: [UserResponseDto] })
+  items!: UserResponseDto[];
+
+  @ApiProperty({ type: String, nullable: true })
+  nextCursor!: string | null;
+
+  @ApiProperty()
+  hasMore!: boolean;
+}
