@@ -13,9 +13,9 @@ export interface CloudInitOptions {
   githubRef?: string;
   githubRepo: string;
   githubToken: string;
-  minioBucket?: string;
-  minioRootPassword: string;
-  minioRootUser: string;
+  rustfsAccessKey: string;
+  rustfsBucket?: string;
+  rustfsSecretKey: string;
   postgresPassword: string;
   redisPassword: string;
   sentryDsn?: string;
@@ -68,9 +68,9 @@ export function buildCloudInit(options: CloudInitOptions): string {
     githubRef,
     githubRepo,
     githubToken,
-    minioBucket,
-    minioRootPassword,
-    minioRootUser,
+    rustfsAccessKey,
+    rustfsBucket,
+    rustfsSecretKey,
     postgresPassword,
     redisPassword,
     sentryDsn,
@@ -108,8 +108,8 @@ export function buildCloudInit(options: CloudInitOptions): string {
     envLine("BETTER_AUTH_SECRET", betterAuthSecret),
     envLine("POSTGRES_PASSWORD", postgresPassword),
     envLine("REDIS_PASSWORD", redisPassword),
-    envLine("MINIO_ROOT_USER", minioRootUser),
-    envLine("MINIO_ROOT_PASSWORD", minioRootPassword),
+    envLine("RUSTFS_ACCESS_KEY", rustfsAccessKey),
+    envLine("RUSTFS_SECRET_KEY", rustfsSecretKey),
     envLine("POSTGRES_USER", "postgres"),
     envLine("POSTGRES_DB", "appdb"),
     envLine(
@@ -141,7 +141,7 @@ export function buildCloudInit(options: CloudInitOptions): string {
     envLine("BACKUP_S3_ACCESS_KEY", backupS3AccessKey ?? ""),
     envLine("BACKUP_S3_SECRET_KEY", backupS3SecretKey ?? ""),
     envLine("BACKUP_RETENTION_DAYS", backupRetentionDays ?? "7"),
-    envLine("MINIO_BUCKET", minioBucket ?? "uploads"),
+    envLine("RUSTFS_BUCKET", rustfsBucket ?? "uploads"),
   ].join("\n");
 
   const bootstrapScript = `#!/bin/bash

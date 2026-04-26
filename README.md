@@ -13,7 +13,7 @@ Production-ready monorepo with a **NestJS REST API** and **Next.js** frontend.
 | ORM           | Drizzle ORM                | 0.45.x   |
 | Database      | PostgreSQL 17              | —        |
 | Cache         | Redis 8                    | —        |
-| Storage       | MinIO                      | —        |
+| Storage       | RustFS                     | —        |
 | Frontend      | Next.js (App Router)       | 16.2     |
 | UI            | shadcn/ui — **luma** style | v4       |
 | Styling       | Tailwind CSS               | v4       |
@@ -47,7 +47,7 @@ Production-ready monorepo with a **NestJS REST API** and **Next.js** frontend.
 │   ├── eslint-config/              # Shared ESLint configs
 │   └── typescript-config/          # Shared tsconfigs
 ├── docker/
-│   └── docker-compose.yml          # PostgreSQL · Redis · MinIO · MailHog
+│   └── docker-compose.yml          # PostgreSQL · Redis · RustFS · MailHog
 └── .env.example
 ```
 
@@ -96,7 +96,7 @@ pnpm dev
 | Swagger                | http://localhost:3001/api/docs              |
 | Health                 | http://localhost:3001/api/health            |
 | Invitation accept flow | http://localhost:3000/accept-invitation/:id |
-| MinIO console          | http://localhost:9001                       |
+| RustFS console         | http://localhost:9001                       |
 | MailHog UI             | http://localhost:8025                       |
 
 ## Commands
@@ -108,7 +108,7 @@ pnpm dev
 | `pnpm test`        | Run Vitest across all packages                  |
 | `pnpm api:dev`     | Run only the API, including `@repo/db` prebuild |
 | `pnpm web:dev`     | Run only the web app                            |
-| `pnpm infra:up`    | Start PostgreSQL, Redis, MinIO, and MailHog     |
+| `pnpm infra:up`    | Start PostgreSQL, Redis, RustFS, and MailHog    |
 | `pnpm infra:down`  | Stop local infrastructure                       |
 | `pnpm lint`        | Lint all packages                               |
 | `pnpm check-types` | TypeScript check all packages                   |
@@ -131,6 +131,10 @@ Short guides:
 - [Pulumi single-server infra](./infra/README.md)
 - [Sentry](./docs/sentry.md)
 - [Git hooks](./docs/git-hooks.md)
+
+This template uses RustFS for S3-compatible object storage. RustFS is an Apache
+2.0 replacement for MinIO, whose open-source distribution changed and repository
+was archived in April 2026.
 
 ### Add a new feature module to the API
 
