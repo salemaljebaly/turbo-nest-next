@@ -127,6 +127,8 @@ Short guides:
 - [shadcn presets](./docs/shadcn.md)
 - [Single-server containers](./docs/single-server.md)
 - [S3 backups](./docs/backups.md)
+- [Sentry](./docs/sentry.md)
+- [Git hooks](./docs/git-hooks.md)
 
 ### Add a new feature module to the API
 
