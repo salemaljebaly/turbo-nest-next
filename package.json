@@ -14,6 +14,7 @@
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\" --ignore-path .gitignore",
     "check-types": "turbo run check-types",
+    "verify:push": "pnpm lint && pnpm check-types && pnpm test && pnpm api:check",
     "test": "turbo run test",
     "test:e2e": "turbo run test:e2e",
     "stress:build": "pnpm --filter=@repo/k6 build",
