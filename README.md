@@ -126,6 +126,7 @@ Short guides:
 - [Scaling path](./docs/scaling.md)
 - [shadcn presets](./docs/shadcn.md)
 - [Single-server containers](./docs/single-server.md)
+- [S3 backups](./docs/backups.md)
 - [Sentry](./docs/sentry.md)
 - [Git hooks](./docs/git-hooks.md)
 
