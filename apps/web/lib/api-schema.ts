@@ -20,6 +20,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/observability/sentry-smoke": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Manually trigger a Sentry smoke-test error when enabled */
+    get: operations["SentrySmokeController_triggerSentrySmoke_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/health": {
     parameters: {
       query?: never;
@@ -119,6 +136,23 @@ export interface operations {
             message?: string;
           };
         };
+      };
+    };
+  };
+  SentrySmokeController_triggerSentrySmoke_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };

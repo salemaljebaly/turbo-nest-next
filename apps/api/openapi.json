@@ -33,6 +33,19 @@
         "tags": ["app"]
       }
     },
+    "/api/v1/observability/sentry-smoke": {
+      "get": {
+        "operationId": "SentrySmokeController_triggerSentrySmoke_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Manually trigger a Sentry smoke-test error when enabled",
+        "tags": ["observability"]
+      }
+    },
     "/api/health": {
       "get": {
         "operationId": "HealthController_check",
