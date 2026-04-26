@@ -36,6 +36,8 @@ The API uses a generic observability interface. Sentry is enabled only when `SEN
 
 Keep `SENTRY_TRACES_SAMPLE_RATE=0` by default, then raise it carefully in staging or production.
 
+Use [Sentry smoke testing](./sentry.md) after configuring a real DSN.
+
 ## Browser Tests
 
 The web app has a Playwright foundation for auth and protected-route flows:

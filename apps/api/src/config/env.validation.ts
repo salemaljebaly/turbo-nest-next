@@ -27,6 +27,10 @@ const envSchema = z.object({
   SENTRY_RELEASE: z.string().optional(),
   SENTRY_SAMPLE_RATE: z.coerce.number().min(0).max(1).default(1),
   SENTRY_TRACES_SAMPLE_RATE: z.coerce.number().min(0).max(1).default(0),
+  SENTRY_SMOKE_TEST_ENABLED: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((value) => value === 'true'),
 
   // Email (optional in dev)
   SMTP_HOST: z.string().optional(),
