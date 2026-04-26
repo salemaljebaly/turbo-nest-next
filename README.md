@@ -166,6 +166,18 @@ UI ownership rule:
 Add to `packages/types/src/`, export from `packages/types/src/index.ts`.
 Import in any app: `import { MySchema } from '@repo/types'`
 
+### Background jobs
+
+The queue contract lives in `packages/jobs`. Enqueue jobs from the API through
+an injectable service, then process them in `apps/worker`.
+
+Example flow:
+
+1. `packages/jobs` defines the `template.ping` payload schema.
+2. `apps/api/src/jobs/jobs.service.ts` calls `enqueueJob()`.
+3. `POST /api/v1/jobs/ping` queues a message for authenticated users.
+4. `apps/worker/src/main.ts` processes the job and logs the message.
+
 ### Use the API client in Next.js
 
 ```typescript
