@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module.js';
 import { validate } from './config/env.validation.js';
 import { DatabaseModule } from './database/database.module.js';
 import { HealthModule } from './health/health.module.js';
+import { JobsModule } from './jobs/jobs.module.js';
 import { SentrySmokeController } from './observability/sentry-smoke.controller.js';
 import { UsersModule } from './users/users.module.js';
 
@@ -29,6 +30,7 @@ import { UsersModule } from './users/users.module.js';
     HealthModule,
     AuthModule,
     UsersModule,
+    JobsModule,
   ],
   controllers: [AppController, SentrySmokeController],
   providers: [

@@ -5,8 +5,12 @@ import { QUEUE_NAMES, createWorker } from "@repo/jobs";
 const worker = createWorker(QUEUE_NAMES.default, async (job) => {
   switch (job.name) {
     case "template.ping":
-      console.info("Processed template ping job", job.data);
-      return { ok: true };
+      console.info("Processed template ping job", {
+        id: job.id,
+        message: job.data.message,
+        processedAt: new Date().toISOString(),
+      });
+      return { ok: true, processedAt: new Date().toISOString() };
     default:
       throw new Error(`Unsupported job: ${job.name satisfies never}`);
   }

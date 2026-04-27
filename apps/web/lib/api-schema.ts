@@ -70,6 +70,23 @@ export interface paths {
     patch: operations["AuthController_handleAuth_patch"];
     trace?: never;
   };
+  "/api/v1/users": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List users with cursor pagination */
+    get: operations["UsersController_list_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/users/me": {
     parameters: {
       query?: never;
@@ -81,6 +98,24 @@ export interface paths {
     get: operations["UsersController_me_v1"];
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Update the current user profile */
+    patch: operations["UsersController_updateMe_v1"];
+    trace?: never;
+  };
+  "/api/v1/jobs/ping": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Enqueue a template ping background job */
+    post: operations["JobsController_enqueuePing_v1"];
     delete?: never;
     options?: never;
     head?: never;
@@ -104,6 +139,25 @@ export interface components {
       createdAt: string;
       /** Format: date-time */
       updatedAt: string;
+    };
+    UsersListResponseDto: {
+      items: components["schemas"]["UserResponseDto"][];
+      nextCursor: string | null;
+      hasMore: boolean;
+    };
+    UpdateProfileDto: {
+      /** @example Lamah */
+      name?: string;
+      /** @example https://example.com/avatar.png */
+      image?: string | null;
+    };
+    EnqueuePingJobResponseDto: {
+      queued: boolean;
+      message: string;
+    };
+    EnqueuePingJobDto: {
+      /** @example hello from the API */
+      message: string;
     };
   };
   responses: never;
@@ -393,6 +447,36 @@ export interface operations {
       };
     };
   };
+  UsersController_list_v1: {
+    parameters: {
+      query?: {
+        /** @description Page size between 1 and 100 */
+        limit?: number;
+        /** @description Last user id from the previous page */
+        cursor?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Paginated users wrapped in the standard API envelope */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {boolean} */
+            success: true;
+            data: components["schemas"]["UsersListResponseDto"];
+            message?: string;
+          };
+        };
+      };
+    };
+  };
   UsersController_me_v1: {
     parameters: {
       query?: never;
@@ -412,6 +496,64 @@ export interface operations {
             /** @enum {boolean} */
             success: true;
             data: components["schemas"]["UserResponseDto"];
+            message?: string;
+          };
+        };
+      };
+    };
+  };
+  UsersController_updateMe_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateProfileDto"];
+      };
+    };
+    responses: {
+      /** @description Updated authenticated user wrapped in the standard API envelope */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {boolean} */
+            success: true;
+            data: components["schemas"]["UserResponseDto"];
+            message?: string;
+          };
+        };
+      };
+    };
+  };
+  JobsController_enqueuePing_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["EnqueuePingJobDto"];
+      };
+    };
+    responses: {
+      /** @description Queued ping job wrapped in the standard API envelope */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {boolean} */
+            success: true;
+            data: components["schemas"]["EnqueuePingJobResponseDto"];
             message?: string;
           };
         };

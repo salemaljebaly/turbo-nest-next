@@ -12,7 +12,7 @@ fi
 echo "=== $(date -u +%Y-%m-%dT%H:%M:%SZ) deploy start ==="
 
 docker compose --env-file .env -f docker-compose.yml build api web
-docker compose --env-file .env -f docker-compose.yml up -d postgres redis minio
+docker compose --env-file .env -f docker-compose.yml up -d postgres redis rustfs
 docker compose --env-file .env -f docker-compose.yml up -d api web caddy
 
 docker compose --env-file .env -f docker-compose.yml ps
