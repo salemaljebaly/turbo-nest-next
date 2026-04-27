@@ -101,7 +101,8 @@ export interface paths {
     delete?: never;
     options?: never;
     head?: never;
-    patch?: never;
+    /** Update the current user profile */
+    patch: operations["UsersController_updateMe_v1"];
     trace?: never;
   };
   "/api/v1/jobs/ping": {
@@ -138,6 +139,17 @@ export interface components {
       createdAt: string;
       /** Format: date-time */
       updatedAt: string;
+    };
+    UsersListResponseDto: {
+      items: components["schemas"]["UserResponseDto"][];
+      nextCursor: string | null;
+      hasMore: boolean;
+    };
+    UpdateProfileDto: {
+      /** @example Lamah */
+      name?: string;
+      /** @example https://example.com/avatar.png */
+      image?: string | null;
     };
     EnqueuePingJobResponseDto: {
       queued: boolean;
@@ -475,6 +487,35 @@ export interface operations {
     requestBody?: never;
     responses: {
       /** @description Current authenticated user wrapped in the standard API envelope */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {boolean} */
+            success: true;
+            data: components["schemas"]["UserResponseDto"];
+            message?: string;
+          };
+        };
+      };
+    };
+  };
+  UsersController_updateMe_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateProfileDto"];
+      };
+    };
+    responses: {
+      /** @description Updated authenticated user wrapped in the standard API envelope */
       200: {
         headers: {
           [name: string]: unknown;
