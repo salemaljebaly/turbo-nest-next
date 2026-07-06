@@ -61,6 +61,7 @@ services:
       SENTRY_SAMPLE_RATE: ${SENTRY_SAMPLE_RATE:-1}
       SENTRY_TRACES_SAMPLE_RATE: ${SENTRY_TRACES_SAMPLE_RATE:-0}
       SENTRY_SMOKE_TEST_ENABLED: ${SENTRY_SMOKE_TEST_ENABLED:-false}
+      METRICS_TOKEN: ${METRICS_TOKEN:-}
       SMTP_HOST: ${SMTP_HOST:-}
       SMTP_PORT: ${SMTP_PORT:-}
       SMTP_USER: ${SMTP_USER:-}
@@ -72,6 +73,22 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+
+  migrate:
+    image: ${MIGRATOR_IMAGE:-turbo-nest-next-migrator:single-server}
+    build:
+      context: ../..
+      dockerfile: apps/api/Dockerfile
+      target: migrator
+      args:
+        NODE_VERSION: ${NODE_VERSION:-22}
+    profiles: ["migration"]
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
 
   worker:
     image: ${WORKER_IMAGE:-turbo-nest-next-worker:single-server}
@@ -147,6 +164,28 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+
+  alloy:
+    image: grafana/alloy:v1.11.3
+    restart: unless-stopped
+    profiles: ["observability"]
+    command:
+      - run
+      - /etc/alloy/config.alloy
+      - --server.http.listen-addr=0.0.0.0:12345
+    environment:
+      GRAFANA_CLOUD_PROMETHEUS_URL: ${GRAFANA_CLOUD_PROMETHEUS_URL:-}
+      GRAFANA_CLOUD_PROMETHEUS_USERNAME: ${GRAFANA_CLOUD_PROMETHEUS_USERNAME:-}
+      GRAFANA_CLOUD_PROMETHEUS_TOKEN: ${GRAFANA_CLOUD_PROMETHEUS_TOKEN:-}
+      GRAFANA_CLOUD_LOKI_URL: ${GRAFANA_CLOUD_LOKI_URL:-}
+      GRAFANA_CLOUD_LOKI_USERNAME: ${GRAFANA_CLOUD_LOKI_USERNAME:-}
+      GRAFANA_CLOUD_LOKI_TOKEN: ${GRAFANA_CLOUD_LOKI_TOKEN:-}
+    volumes:
+      - ./observability/alloy-config.alloy:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      api:
+        condition: service_started
 
 volumes:
   caddy_data:

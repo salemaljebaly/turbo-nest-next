@@ -13,6 +13,8 @@ as a container.
 - Redis 8
 - RustFS S3-compatible object storage
 - Worker: optional Compose profile
+- Migrator: one-shot Drizzle migration profile
+- Alloy: optional Grafana Cloud logs and metrics profile
 
 ## Server Prerequisites
 
@@ -42,15 +44,16 @@ Run the first deployment:
 ./deploy.sh
 ```
 
-Run database migrations from a trusted environment before serving real traffic:
+`deploy.sh` builds the API, web, worker, and migrator images, starts
+dependencies with `--wait`, runs the migration profile, starts runtime services,
+and checks `APP_HEALTH_URL` when configured.
+
+Run database migrations manually when needed:
 
 ```bash
-pnpm db:migrate
+docker compose --env-file .env -f docker-compose.yml \
+  --profile migration run --rm migrate
 ```
-
-The current production API image is optimized for runtime and does not include a
-general-purpose migration runner. Add a dedicated migration job before using
-this profile for unattended production deploys.
 
 ## Daily Deploy
 
@@ -61,6 +64,14 @@ git checkout main
 git pull --ff-only
 deploy/single-server/deploy.sh
 ```
+
+Queued CI deploys use:
+
+- `enqueue-deploy.sh` to validate and queue an exact commit.
+- `async-deploy.sh` to fetch that commit and run deploy in the background.
+- `install-ci-access.sh` to install host commands for a restricted deploy user.
+- `remote-deploy.sh` for a developer-triggered SSH deploy.
+- `redeploy.sh` for a pull-and-redeploy on the host.
 
 ## Worker
 
@@ -95,6 +106,17 @@ docker compose --env-file deploy/single-server/.env \
   -f deploy/single-server/docker-compose.yml restart api
 ```
 
+## Observability
+
+Enable Alloy after setting Grafana Cloud variables in `.env`:
+
+```bash
+docker compose --env-file .env -f docker-compose.yml \
+  --profile observability up -d alloy
+```
+
+See [Observability](./observability.md).
+
 ## Backups
 
 Use [S3 backups](./backups.md) for the single-server profile. At minimum, a
@@ -105,3 +127,10 @@ production server needs:
 - restore test steps
 
 Do not consider backups complete until restore has been tested.
+
+Restore helpers:
+
+- `restore-postgres.sh`: restore a PostgreSQL dump.
+- `restore-object-storage.sh`: restore a generic object storage archive.
+- `recover-latest.sh`: restore latest database and object storage archives.
+- `restore-drill.sh`: run the latest restore path as a drill.

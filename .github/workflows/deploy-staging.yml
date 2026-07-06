@@ -1,0 +1,76 @@
+name: Deploy staging
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: Full commit SHA to deploy; defaults to main
+        required: false
+        type: string
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Queue server deployment
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      DEPLOY_HOST: ${{ secrets.DEPLOY_SSH_HOST }}
+      DEPLOY_PORT: ${{ secrets.DEPLOY_SSH_PORT || '22' }}
+      DEPLOY_USER: ${{ secrets.DEPLOY_SSH_USER || 'template-deploy' }}
+      DEPLOY_SHA: ${{ inputs.commit || github.event.workflow_run.head_sha || github.sha }}
+      DEPLOY_RUN_ID: ${{ github.run_id }}
+    steps:
+      - name: Validate deployment inputs
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          test -n "$DEPLOY_HOST" || { echo '::error::DEPLOY_SSH_HOST is missing'; exit 1; }
+          test -n "$DEPLOY_KEY" || { echo '::error::DEPLOY_SSH_KEY is missing'; exit 1; }
+          test -n "$DEPLOY_KNOWN_HOSTS" || { echo '::error::DEPLOY_SSH_KNOWN_HOSTS is missing'; exit 1; }
+          [[ "$DEPLOY_SHA" =~ ^[0-9a-f]{40}$ ]] || { echo '::error::A full commit SHA is required'; exit 1; }
+
+      - name: Configure pinned SSH host key
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          install -d -m 0700 ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/id_ed25519
+          chmod 0600 ~/.ssh/id_ed25519
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 0600 ~/.ssh/known_hosts
+
+      - name: Queue deployment on staging server
+        run: |
+          set -euo pipefail
+          ssh -i ~/.ssh/id_ed25519 -p "$DEPLOY_PORT" \
+            "$DEPLOY_USER@$DEPLOY_HOST" \
+            "enqueue $DEPLOY_SHA $DEPLOY_RUN_ID"
+
+      - name: Publish deployment summary
+        if: always()
+        run: |
+          {
+            echo '## Staging deployment'
+            echo
+            echo "- Commit: \`$DEPLOY_SHA\`"
+            echo "- Queue result: **${{ job.status }}**"
+            echo "- Final result: check **Template staging deployment** on the commit"
+          } >> "$GITHUB_STEP_SUMMARY"
