@@ -31,6 +31,7 @@ Production-ready monorepo with a **NestJS REST API** and **Next.js** frontend.
   profile.
 - Optional AI package with Vercel AI SDK provider helpers, authenticated chat,
   tool examples, persistence, and dashboard widget.
+- `create-turbo-nest-next` scaffolder for `npx`-style project creation.
 - Docker Compose local infrastructure and production image Dockerfiles.
 
 ## Stack
@@ -161,6 +162,7 @@ Short guides:
 - [Frontend foundations](./docs/frontend-foundations.md)
 - [Observability](./docs/observability.md)
 - [AI package](./docs/ai.md)
+- [Create-app scaffolder](./docs/create-app.md)
 - [Scaling path](./docs/scaling.md)
 - [shadcn presets](./docs/shadcn.md)
 - [Stress testing](./docs/stress-testing.md)
