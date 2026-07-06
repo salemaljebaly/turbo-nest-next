@@ -53,3 +53,16 @@ Normal API endpoints return the standard envelope:
 
 Framework-owned endpoints, such as Better Auth and health checks, keep their own
 response shape.
+
+Errors use the standard envelope:
+
+```json
+{ "error": { "code": "PROJECT_NOT_FOUND", "message": "Project not found" } }
+```
+
+Throw `AppException` with a registered code from API services. The code union is
+exported from `packages/types` so web code can map codes to local messages.
+
+The `projects` module is the reference API module for new features. It keeps
+database access inside the service, uses the API as the frontend boundary, and
+demonstrates safe list queries, idempotency, rate limits, and CSV export.

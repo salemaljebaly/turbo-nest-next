@@ -1,4 +1,5 @@
 import { writeFile, mkdir } from 'node:fs/promises';
+import { inspect } from 'node:util';
 import { dirname, resolve } from 'node:path';
 import { NestFactory } from '@nestjs/core';
 
@@ -13,7 +14,10 @@ async function generateOpenApi() {
   const [{ AppModule }, { configureApp, createOpenApiDocument }] =
     await Promise.all([import('./app.module.js'), import('./app.setup.js')]);
 
-  const app = await NestFactory.create(AppModule, { logger: false });
+  const app = await NestFactory.create(AppModule, {
+    logger: false,
+    abortOnError: false,
+  });
 
   configureApp(app);
 
@@ -26,6 +30,6 @@ async function generateOpenApi() {
 }
 
 generateOpenApi().catch((error: unknown) => {
-  console.error(error);
+  console.error(error instanceof Error ? error.stack : inspect(error));
   process.exitCode = 1;
 });

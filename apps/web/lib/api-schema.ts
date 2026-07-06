@@ -44,7 +44,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Infrastructure health check (database + cache) */
+    /** Infrastructure health check (database + cache + storage + worker) */
     get: operations["HealthController_check"];
     put?: never;
     post?: never;
@@ -122,6 +122,59 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/projects": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List projects with safe pagination and sorting */
+    get: operations["ProjectsController_list_v1"];
+    put?: never;
+    /** Create a project */
+    post: operations["ProjectsController_create_v1"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/export.csv": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Export projects as CSV */
+    get: operations["ProjectsController_exportCsv_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get a project */
+    get: operations["ProjectsController_get_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Update a project */
+    patch: operations["ProjectsController_update_v1"];
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -158,6 +211,20 @@ export interface components {
     EnqueuePingJobDto: {
       /** @example hello from the API */
       message: string;
+    };
+    CreateProjectDto: {
+      /** @example Launch checklist */
+      name: string;
+      /** @example Tasks and notes for the first release. */
+      description?: string;
+    };
+    UpdateProjectDto: {
+      /** @example Launch checklist */
+      name?: string;
+      /** @example Tasks and notes for the first release. */
+      description?: string;
+      /** @enum {string} */
+      status?: "active" | "archived";
     };
   };
   responses: never;
@@ -557,6 +624,108 @@ export interface operations {
             message?: string;
           };
         };
+      };
+    };
+  };
+  ProjectsController_list_v1: {
+    parameters: {
+      query?: {
+        limit?: number;
+        cursor?: string;
+        search?: string;
+        sort?: "name" | "-name" | "createdAt" | "-createdAt";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ProjectsController_create_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateProjectDto"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ProjectsController_exportCsv_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ProjectsController_get_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ProjectsController_update_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateProjectDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };

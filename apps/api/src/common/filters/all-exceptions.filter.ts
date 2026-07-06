@@ -1,8 +1,8 @@
 import {
-  ExceptionFilter,
   Catch,
-  ArgumentsHost,
+  ExceptionFilter,
   HttpException,
+  ArgumentsHost,
   HttpStatus,
   Logger,
 } from '@nestjs/common';
@@ -40,11 +40,26 @@ export class AllExceptionsFilter implements ExceptionFilter {
             'An error occurred')
           : 'Internal server error';
     const normalizedMessage =
-      typeof message === 'string'
-        ? message
-        : Array.isArray(message)
-          ? message.map((part) => String(part)).join(', ')
-          : 'An error occurred';
+      status >= 500
+        ? 'Internal server error'
+        : typeof message === 'string'
+          ? message
+          : Array.isArray(message)
+            ? message.map((part) => String(part)).join(', ')
+            : 'An error occurred';
+    const responseCode =
+      typeof exceptionResponse === 'object' && exceptionResponse !== null
+        ? (exceptionResponse as Record<string, unknown>)['code']
+        : undefined;
+    const details =
+      typeof exceptionResponse === 'object' && exceptionResponse !== null
+        ? Object.fromEntries(
+            Object.entries(exceptionResponse as Record<string, unknown>).filter(
+              ([key]) =>
+                !['code', 'message', 'statusCode', 'error'].includes(key),
+            ),
+          )
+        : undefined;
 
     if (status >= 500) {
       this.logger.error(
@@ -64,11 +79,18 @@ export class AllExceptionsFilter implements ExceptionFilter {
     }
 
     response.status(status).json({
-      success: false,
       error: {
         code:
-          HttpStatus[status as unknown as keyof typeof HttpStatus] ?? 'UNKNOWN',
+          status < 500 && typeof responseCode === 'string'
+            ? responseCode
+            : status >= 500
+              ? 'INTERNAL_SERVER_ERROR'
+              : (HttpStatus[status as unknown as keyof typeof HttpStatus] ??
+                'UNKNOWN'),
         message: normalizedMessage,
+        ...(status < 500 && details && Object.keys(details).length > 0
+          ? { details }
+          : {}),
         requestId,
         path: request.url,
         timestamp: new Date().toISOString(),

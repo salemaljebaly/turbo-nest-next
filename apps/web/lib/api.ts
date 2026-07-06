@@ -1,4 +1,4 @@
-import { isApiError, isApiResponse } from "@repo/types";
+import { isApiError, isApiResponse, isApiSuccess } from "@repo/types";
 import type { paths } from "./api-schema";
 
 const BASE_URL =
@@ -100,12 +100,21 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     );
   }
 
-  if (!body.success) {
+  if (isApiError(body)) {
     throw new ApiError(
       res.status,
       body.error.code,
       body.error.message,
       body.error.details,
+    );
+  }
+
+  if (!isApiSuccess<T>(body)) {
+    throw new ApiError(
+      res.status,
+      "INVALID_RESPONSE",
+      "The API response does not match the expected success envelope.",
+      body,
     );
   }
 

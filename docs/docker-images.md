@@ -3,6 +3,7 @@
 The production images are built for small, generic template deployments:
 
 - API: bundle the compiled NestJS app with `@vercel/ncc`, then copy only the bundle and a stripped Node binary into Alpine.
+- API migrator: `docker:build:migrator` builds the `migrator` target, which runs the workspace Drizzle migration command.
 - Web: use Next.js standalone output, disable unused server image optimization, remove unused `sharp` files, then copy only standalone assets and a stripped Node binary into Alpine.
 
 Current local baselines:

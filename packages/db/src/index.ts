@@ -18,6 +18,7 @@ export {
   gt,
   gte,
 } from "drizzle-orm";
+export type { SQLWrapper } from "drizzle-orm";
 
 export type Database = ReturnType<typeof createDb>;
 export type DatabaseConnection = ReturnType<typeof createDbConnection>;
