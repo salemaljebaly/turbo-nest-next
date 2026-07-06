@@ -3,6 +3,7 @@
   "ui": "tui",
   "globalEnv": [
     "CI",
+    "CREATE_APP_TEMPLATE_ROOT",
     "DATABASE_URL",
     "E2E_RUN_AUTH_FLOWS",
     "E2E_TEST_EMAIL",

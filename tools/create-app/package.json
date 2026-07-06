@@ -1,0 +1,30 @@
+{
+  "name": "create-turbo-nest-next",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "create-turbo-nest-next": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsx src/index.ts",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src test --max-warnings 0",
+    "test": "vitest run",
+    "test:e2e": "tsx src/index.ts sample-app --yes --target /tmp/create-turbo-nest-next-smoke --no-worker --no-ai --storage minio --no-install"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.11.0",
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^25.5.2",
+    "eslint": "^10.2.0",
+    "tsx": "^4.21.0",
+    "typescript": "6.0.2",
+    "vitest": "^4.1.2"
+  }
+}

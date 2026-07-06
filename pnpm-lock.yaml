@@ -525,6 +525,37 @@ importers:
         specifier: ^0.25.12
         version: 0.25.12
 
+  tools/create-app:
+    dependencies:
+      "@clack/prompts":
+        specifier: ^0.11.0
+        version: 0.11.0
+      picocolors:
+        specifier: ^1.1.1
+        version: 1.1.1
+    devDependencies:
+      "@repo/eslint-config":
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
+      "@repo/typescript-config":
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
+      "@types/node":
+        specifier: ^25.5.2
+        version: 25.5.2
+      eslint:
+        specifier: ^10.2.0
+        version: 10.2.0(jiti@2.6.1)
+      tsx:
+        specifier: ^4.21.0
+        version: 4.21.0
+      typescript:
+        specifier: 6.0.2
+        version: 6.0.2
+      vitest:
+        specifier: ^4.1.2
+        version: 4.1.2(@opentelemetry/api@1.9.1)(@types/node@25.5.2)(msw@2.12.14(@types/node@25.5.2)(typescript@6.0.2))(vite@7.3.1(@types/node@25.5.2)(jiti@2.6.1)(lightningcss@1.32.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))
+
 packages:
   "@ai-sdk/anthropic@2.0.85":
     resolution:
@@ -1142,6 +1173,18 @@ packages:
     resolution:
       {
         integrity: sha512-DDaRehssg1aNrH4+2hnj1B7vnUGEjU6OIlyRdkMd0aUdIUvKXrJfXsy8LVtXAy7DRvYVluWbMspsRhz2lcW0mQ==,
+      }
+
+  "@clack/core@0.5.0":
+    resolution:
+      {
+        integrity: sha512-p3y0FIOwaYRUPRcMO7+dlmLh8PSRcrjuTndsiA0WAFbWES0mLZlrjVoBRZ9DzkPFJZG6KGkJmoEAY0ZcVWTkow==,
+      }
+
+  "@clack/prompts@0.11.0":
+    resolution:
+      {
+        integrity: sha512-pMN5FcrEw9hUkZA4f+zLlzivQSeQf5dRGJjSUbvVYDLvpKCdQx5OaknvKzgbtXOizhP+SJJJjqEbOe55uKKfAw==,
       }
 
   "@colors/colors@1.5.0":
@@ -11625,6 +11668,17 @@ snapshots:
   "@better-fetch/fetch@1.1.21": {}
 
   "@borewit/text-codec@0.2.2": {}
+
+  "@clack/core@0.5.0":
+    dependencies:
+      picocolors: 1.1.1
+      sisteransi: 1.0.5
+
+  "@clack/prompts@0.11.0":
+    dependencies:
+      "@clack/core": 0.5.0
+      picocolors: 1.1.1
+      sisteransi: 1.0.5
 
   "@colors/colors@1.5.0":
     optional: true
