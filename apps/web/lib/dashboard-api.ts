@@ -59,4 +59,5 @@ export const dashboardApi = {
       {},
     ),
   exportProjects: () => api.download("/v1/projects/export.csv", "projects.csv"),
+  aiStatus: () => api.get<{ enabled: boolean }>("/v1/ai/status"),
 };

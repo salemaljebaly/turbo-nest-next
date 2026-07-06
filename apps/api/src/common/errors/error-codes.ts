@@ -50,6 +50,10 @@ export const ERROR_CODES = {
     status: HttpStatus.BAD_REQUEST,
     message: 'Upload does not match storage policy',
   },
+  AI_NOT_CONFIGURED: {
+    status: HttpStatus.SERVICE_UNAVAILABLE,
+    message: 'AI provider credentials are not configured',
+  },
   INTERNAL_SERVER_ERROR: {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     message: 'Internal server error',

@@ -715,6 +715,42 @@
         "summary": "Approve a project with maker-checker protection",
         "tags": ["projects"]
       }
+    },
+    "/api/v1/ai/status": {
+      "get": {
+        "operationId": "AiController_status_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Check whether AI is configured",
+        "tags": ["ai"]
+      }
+    },
+    "/api/v1/ai/chat": {
+      "post": {
+        "operationId": "AiController_chat_v1",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Stream an authenticated AI chat response",
+        "tags": ["ai"]
+      }
     }
   },
   "info": {

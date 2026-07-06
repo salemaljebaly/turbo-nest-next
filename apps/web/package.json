@@ -14,6 +14,7 @@
     "api:generate": "openapi-typescript ../../apps/api/openapi.json -o lib/api-schema.ts"
   },
   "dependencies": {
+    "@ai-sdk/react": "^3.0.0",
     "@phosphor-icons/react": "^2.1.10",
     "@repo/types": "workspace:*",
     "@repo/ui": "workspace:*",
@@ -22,6 +23,7 @@
     "@tanstack/react-query": "^5.96.2",
     "@tanstack/react-query-devtools": "^5.96.2",
     "better-auth": "^1.6.0",
+    "ai": "^6.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",

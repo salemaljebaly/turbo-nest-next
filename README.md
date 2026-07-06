@@ -29,6 +29,8 @@ Production-ready monorepo with a **NestJS REST API** and **Next.js** frontend.
   `todo:` feature-tag convention.
 - Optional single-server staging deploy queue and Grafana Alloy observability
   profile.
+- Optional AI package with Vercel AI SDK provider helpers, authenticated chat,
+  tool examples, persistence, and dashboard widget.
 - Docker Compose local infrastructure and production image Dockerfiles.
 
 ## Stack
@@ -158,6 +160,7 @@ Short guides:
 - [Platform modules](./docs/platform-modules.md)
 - [Frontend foundations](./docs/frontend-foundations.md)
 - [Observability](./docs/observability.md)
+- [AI package](./docs/ai.md)
 - [Scaling path](./docs/scaling.md)
 - [shadcn presets](./docs/shadcn.md)
 - [Stress testing](./docs/stress-testing.md)
