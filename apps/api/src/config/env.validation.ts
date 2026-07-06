@@ -54,6 +54,13 @@ const envSchema = z.object({
   STORAGE_ACCESS_KEY: z.string().optional(),
   STORAGE_SECRET_KEY: z.string().optional(),
 
+  // AI (optional)
+  AI_PROVIDER: z.enum(['anthropic', 'openai', 'google']).default('anthropic'),
+  AI_MODEL: z.string().default('claude-sonnet-5'),
+  ANTHROPIC_API_KEY: z.string().optional(),
+  OPENAI_API_KEY: z.string().optional(),
+  GOOGLE_GENERATIVE_AI_API_KEY: z.string().optional(),
+
   // App metadata
   APP_NAME: z.string().default('MyApp'),
   APP_URL: z.string().default('http://localhost:3000'),

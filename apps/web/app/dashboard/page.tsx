@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { ExternalLink, HeartPulse, Layers, Plus } from "lucide-react";
 import { AppSidebar, type DashboardSection } from "@/components/app-sidebar";
+import { ChatWidget } from "@/components/chat-widget";
 import { Navbar } from "@/components/navbar";
 import { SettingsDialog } from "@/components/settings-dialog";
 import { AdminTable, type ColumnDef } from "@/components/ui/admin-table";
@@ -146,6 +147,7 @@ export default function DashboardPage() {
         user={user}
         onOpenChange={setSettingsOpen}
       />
+      <ChatWidget />
     </div>
   );
 }

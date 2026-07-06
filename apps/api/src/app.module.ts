@@ -4,6 +4,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { resolve } from 'node:path';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
+import { AiModule } from './ai/ai.module.js';
 import { AdminAuditInterceptor } from './audit/admin-audit.interceptor.js';
 import { AuditModule } from './audit/audit.module.js';
 import { IdempotencyInterceptor } from './common/interceptors/idempotency.interceptor.js';
@@ -48,6 +49,7 @@ import { UsersModule } from './users/users.module.js';
     UsersModule,
     JobsModule,
     ProjectsModule,
+    AiModule,
   ],
   controllers: [AppController, SentrySmokeController, MetricsController],
   providers: [

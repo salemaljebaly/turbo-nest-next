@@ -65,6 +65,7 @@ export const errorMessages: Record<
       "A different person must approve this action.",
     STORAGE_NOT_CONFIGURED: "Storage is not configured for this environment.",
     STORAGE_VALIDATION_FAILED: "The file does not meet upload requirements.",
+    AI_NOT_CONFIGURED: "AI is not configured for this environment.",
   },
 };
 
