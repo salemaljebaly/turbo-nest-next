@@ -1,4 +1,3 @@
-import { isApiError, isApiResponse, isApiSuccess } from "@repo/types";
 import type { paths } from "./api-schema";
 
 const BASE_URL =
@@ -22,6 +21,39 @@ class ApiError extends Error {
     super(message);
     this.name = "ApiError";
   }
+}
+
+type ApiErrorEnvelope = {
+  error: {
+    code: string;
+    message: string;
+    details?: unknown;
+  };
+};
+
+type ApiSuccessEnvelope<T> = {
+  data: T;
+};
+
+type ApiEnvelope<T> = ApiSuccessEnvelope<T> | ApiErrorEnvelope;
+
+function isApiError(value: unknown): value is ApiErrorEnvelope {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    typeof (value as { error?: { code?: unknown; message?: unknown } }).error
+      ?.code === "string" &&
+    typeof (value as { error?: { code?: unknown; message?: unknown } }).error
+      ?.message === "string"
+  );
+}
+
+function isApiSuccess<T>(value: unknown): value is ApiSuccessEnvelope<T> {
+  return typeof value === "object" && value !== null && "data" in value;
+}
+
+function isApiResponse<T>(value: unknown): value is ApiEnvelope<T> {
+  return isApiError(value) || isApiSuccess<T>(value);
 }
 
 async function parseJson(res: Response): Promise<unknown> {
@@ -71,54 +103,81 @@ function toErrorMessage(body: unknown, fallback: string) {
 }
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  const { headers, ...requestOptions } = options ?? {};
+  const requestBody = requestOptions.body;
+  const isFormData =
+    typeof FormData !== "undefined" && requestBody instanceof FormData;
+  const requestHeaders = new Headers(headers);
+  if (!isFormData && !requestHeaders.has("Content-Type")) {
+    requestHeaders.set("Content-Type", "application/json");
+  }
+
   const res = await fetch(`${BASE_URL}${path}`, {
     credentials: "include", // required for Better Auth cookie sessions
-    headers: {
-      "Content-Type": "application/json",
-      ...options?.headers,
-    },
-    ...options,
+    ...requestOptions,
+    headers: requestHeaders,
   });
 
-  const body = await parseJson(res);
+  const responseBody = await parseJson(res);
 
   if (!res.ok) {
-    const err = toErrorMessage(body, res.statusText || "Request failed");
+    const err = toErrorMessage(
+      responseBody,
+      res.statusText || "Request failed",
+    );
     throw new ApiError(res.status, err.code, err.message, err.details);
   }
 
-  if (body === undefined) {
+  if (responseBody === undefined) {
     return undefined as T;
   }
 
-  if (!isApiResponse<T>(body)) {
+  if (!isApiResponse<T>(responseBody)) {
     throw new ApiError(
       res.status,
       "INVALID_RESPONSE",
       "The API response does not match the expected envelope.",
-      body,
+      responseBody,
     );
   }
 
-  if (isApiError(body)) {
+  if (isApiError(responseBody)) {
     throw new ApiError(
       res.status,
-      body.error.code,
-      body.error.message,
-      body.error.details,
+      responseBody.error.code,
+      responseBody.error.message,
+      responseBody.error.details,
     );
   }
 
-  if (!isApiSuccess<T>(body)) {
+  if (!isApiSuccess<T>(responseBody)) {
     throw new ApiError(
       res.status,
       "INVALID_RESPONSE",
       "The API response does not match the expected success envelope.",
-      body,
+      responseBody,
     );
   }
 
-  return body.data;
+  return responseBody.data;
+}
+
+async function download(path: string, filename: string) {
+  const response = await fetch(`${BASE_URL}${path}`, {
+    credentials: "include",
+  });
+  if (!response.ok) {
+    const body = await parseJson(response);
+    const err = toErrorMessage(body, response.statusText || "Export failed");
+    throw new ApiError(response.status, err.code, err.message, err.details);
+  }
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
 }
 
 export const api = {
@@ -156,6 +215,8 @@ export const api = {
 
   delete: <T>(path: ApiPath, options?: Omit<RequestInit, "method" | "body">) =>
     request<T>(path, { method: "DELETE", ...options }),
+
+  download,
 };
 
 export { ApiError };

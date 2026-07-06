@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { DirectionProvider } from "@/components/ui/direction";
+import { dirForLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { Providers } from "./providers";
 import "./globals.css";
@@ -26,10 +27,12 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const direction = dirForLocale("en");
+
   return (
     <html
-      lang="ar"
-      // dir="rtl"
+      lang="en"
+      dir={direction}
       suppressHydrationWarning
       className={cn("font-mono", jetbrainsMono.variable)}
     >
@@ -39,7 +42,7 @@ export default function RootLayout({
           inter.variable,
         )}
       >
-        <DirectionProvider direction="rtl">
+        <DirectionProvider direction={direction}>
           <Providers>{children}</Providers>
         </DirectionProvider>
       </body>
