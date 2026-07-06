@@ -38,6 +38,18 @@ export const ERROR_CODES = {
     status: HttpStatus.CONFLICT,
     message: 'Archived projects cannot be modified',
   },
+  SEPARATION_OF_DUTIES_VIOLATION: {
+    status: HttpStatus.BAD_REQUEST,
+    message: 'The requester and approver must be different users',
+  },
+  STORAGE_NOT_CONFIGURED: {
+    status: HttpStatus.SERVICE_UNAVAILABLE,
+    message: 'Object storage is not configured',
+  },
+  STORAGE_VALIDATION_FAILED: {
+    status: HttpStatus.BAD_REQUEST,
+    message: 'Upload does not match storage policy',
+  },
   INTERNAL_SERVER_ERROR: {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     message: 'Internal server error',

@@ -11,6 +11,8 @@ import { z } from "zod";
 export const QUEUE_NAMES = {
   default: "default",
   mail: "mail",
+  notifications: "notifications",
+  maintenance: "maintenance",
 } as const;
 
 export type QueueName = (typeof QUEUE_NAMES)[keyof typeof QUEUE_NAMES];
@@ -25,6 +27,10 @@ export interface JobPayloadMap {
   "template.ping": {
     message: string;
   };
+  "notification.send": {
+    notificationId: string;
+  };
+  "maintenance.daily-cleanup": Record<string, never>;
 }
 
 export type JobName = keyof JobPayloadMap;
@@ -42,11 +48,17 @@ export interface QueueRuntimeOptions {
 const pingPayloadSchema = z.object({
   message: z.string().min(1),
 });
+const notificationSendPayloadSchema = z.object({
+  notificationId: z.uuid(),
+});
+const dailyCleanupPayloadSchema = z.object({});
 
 const jobSchemas: {
   [Name in JobName]: z.ZodType<JobPayloadMap[Name]>;
 } = {
   "template.ping": pingPayloadSchema,
+  "notification.send": notificationSendPayloadSchema,
+  "maintenance.daily-cleanup": dailyCleanupPayloadSchema,
 };
 
 export function createRedisConnection(redisUrl?: string) {

@@ -7,11 +7,19 @@ import { AUTH_TOKEN, createAuth } from './auth.js';
 import { AuthController } from './auth.controller.js';
 import { AuthGuard } from './auth.guard.js';
 import { createEmailSender } from './email.js';
+import { PermissionsGuard } from './permissions.guard.js';
+import { PermissionsService } from './permissions.service.js';
+import { ResourceScopeGuard } from './resource-scope.guard.js';
+import { ResourceScopeService } from './resource-scope.service.js';
 
 @Module({
   controllers: [AuthController],
   providers: [
     AuthGuard,
+    PermissionsGuard,
+    PermissionsService,
+    ResourceScopeGuard,
+    ResourceScopeService,
     {
       provide: AUTH_TOKEN,
       inject: [ConfigService, DATABASE_TOKEN],
@@ -41,6 +49,13 @@ import { createEmailSender } from './email.js';
       },
     },
   ],
-  exports: [AUTH_TOKEN, AuthGuard],
+  exports: [
+    AUTH_TOKEN,
+    AuthGuard,
+    PermissionsGuard,
+    PermissionsService,
+    ResourceScopeGuard,
+    ResourceScopeService,
+  ],
 })
 export class AuthModule {}

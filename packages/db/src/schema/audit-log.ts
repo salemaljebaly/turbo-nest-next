@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { user } from "./auth.js";
 
 export const auditLog = pgTable("audit_log", {
@@ -7,5 +7,8 @@ export const auditLog = pgTable("audit_log", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   action: text("action").notNull(),
+  entityType: text("entity_type").notNull().default("unknown"),
+  entityId: text("entity_id"),
+  diff: jsonb("diff"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
