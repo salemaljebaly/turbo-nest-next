@@ -25,6 +25,10 @@ Production-ready monorepo with a **NestJS REST API** and **Next.js** frontend.
 - Typed frontend API client helpers with error-code translation hooks.
 - OpenAPI generation and typed frontend API schema checks.
 - Sentry wiring for API and web runtime errors.
+- Agent-ready `.claude/skills`, `AGENTS.md`, runbooks, handoff templates, and
+  `todo:` feature-tag convention.
+- Optional single-server staging deploy queue and Grafana Alloy observability
+  profile.
 - Docker Compose local infrastructure and production image Dockerfiles.
 
 ## Stack
@@ -153,6 +157,7 @@ Short guides:
 - [API platform](./docs/api-platform.md)
 - [Platform modules](./docs/platform-modules.md)
 - [Frontend foundations](./docs/frontend-foundations.md)
+- [Observability](./docs/observability.md)
 - [Scaling path](./docs/scaling.md)
 - [shadcn presets](./docs/shadcn.md)
 - [Stress testing](./docs/stress-testing.md)
@@ -161,6 +166,15 @@ Short guides:
 - [Pulumi single-server infra](./infra/README.md)
 - [Sentry](./docs/sentry.md)
 - [Git hooks](./docs/git-hooks.md)
+- [Plan and conventions](./docs/plan/conventions.md)
+- [Background jobs runbook](./docs/runbooks/background-jobs.md)
+
+Docs are split for human and agent discovery:
+
+- `docs/plan/` holds roadmap and implementation conventions.
+- `docs/handoffs/` holds handoff notes between agents or sessions.
+- `docs/runbooks/` holds operational response procedures.
+- `docs/ops/` holds shorter operational notes and manual follow-ups.
 
 This template uses RustFS for S3-compatible object storage. RustFS is an Apache
 2.0 replacement for MinIO, whose open-source distribution changed and repository
