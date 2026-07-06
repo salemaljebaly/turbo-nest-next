@@ -1,83 +1,56 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { Menu, Settings } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Zap, LogOut, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { signOut, useSession } from "@/lib/auth/client";
 
-const subscribeToClientMount = () => () => {};
-const getClientSnapshot = () => true;
-const getServerSnapshot = () => false;
-
-export function Navbar() {
-  const { data: session, isPending } = useSession();
-  const router = useRouter();
-  const mounted = useSyncExternalStore(
-    subscribeToClientMount,
-    getClientSnapshot,
-    getServerSnapshot,
-  );
-
-  async function handleSignOut() {
-    await signOut({
-      fetchOptions: {
-        onSuccess: () => router.push("/"),
-      },
-    });
+export function Navbar({
+  title = "turbo-nest-next",
+  onOpenSettings,
+}: {
+  title?: string;
+  onOpenSettings?: () => void;
+}) {
+  if (!onOpenSettings) {
+    return (
+      <header className="fixed top-0 right-0 left-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+          <Link href="/" className="flex items-center gap-2 font-semibold">
+            <span className="flex size-7 items-center justify-center bg-primary text-xs text-primary-foreground">
+              T
+            </span>
+            <span className="text-sm tracking-tight">{title}</span>
+          </Link>
+          <nav className="flex items-center gap-2">
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/sign-in">Sign in</Link>
+            </Button>
+            <Button asChild size="sm">
+              <Link href="/sign-up">Get started</Link>
+            </Button>
+          </nav>
+        </div>
+      </header>
+    );
   }
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
-        {/* Logo */}
-        <Link
-          href="/"
-          className="flex items-center gap-2 font-semibold text-foreground transition-opacity hover:opacity-80"
+    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-background/90 px-4 backdrop-blur">
+      <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          className="md:hidden"
+          aria-label="Open navigation"
         >
-          <span className="flex size-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
-            <Zap className="size-3.5" />
-          </span>
-          <span className="text-sm tracking-tight">turbo-nest-next</span>
-        </Link>
-
-        {/* Right side */}
-        <div className="flex items-center gap-2">
-          {!mounted || isPending ? (
-            <div className="h-8 w-32 animate-pulse rounded-lg bg-muted" />
-          ) : session ? (
-            <>
-              <Button asChild variant="ghost" size="sm" className="gap-2">
-                <Link href="/dashboard">
-                  <LayoutDashboard className="size-3.5" />
-                  Dashboard
-                </Link>
-              </Button>
-              <div className="flex size-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
-                {session.user.name?.charAt(0).toUpperCase() ?? "U"}
-              </div>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                onClick={handleSignOut}
-                title="Sign out"
-              >
-                <LogOut className="size-3.5" />
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button asChild variant="ghost" size="sm">
-                <Link href="/sign-in">Sign in</Link>
-              </Button>
-              <Button asChild size="sm">
-                <Link href="/sign-up">Get started</Link>
-              </Button>
-            </>
-          )}
-        </div>
+          <Menu className="size-4" />
+        </Button>
+        <h1 className="text-sm font-semibold">{title}</h1>
       </div>
+      <Button variant="outline" size="sm" onClick={onOpenSettings}>
+        <Settings className="size-3.5" />
+        Settings
+      </Button>
     </header>
   );
 }

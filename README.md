@@ -20,6 +20,9 @@ Production-ready monorepo with a **NestJS REST API** and **Next.js** frontend.
 - CSV export helper with spreadsheet formula protection.
 - Query-safety helpers for pagination, UUID cursors, LIKE search, and sort whitelists.
 - Neutral `projects` example module developers can copy for new API features.
+- Dashboard shell with RBAC-filtered navigation and settings.
+- AdminTable, EntitySelect, loading, empty, and error state conventions.
+- Typed frontend API client helpers with error-code translation hooks.
 - OpenAPI generation and typed frontend API schema checks.
 - Sentry wiring for API and web runtime errors.
 - Docker Compose local infrastructure and production image Dockerfiles.
@@ -149,6 +152,7 @@ Short guides:
 - [Architecture](./docs/architecture.md)
 - [API platform](./docs/api-platform.md)
 - [Platform modules](./docs/platform-modules.md)
+- [Frontend foundations](./docs/frontend-foundations.md)
 - [Scaling path](./docs/scaling.md)
 - [shadcn presets](./docs/shadcn.md)
 - [Stress testing](./docs/stress-testing.md)
@@ -175,6 +179,13 @@ nest generate service features/posts
 For a full copyable module, start from `apps/api/src/projects`. It demonstrates
 DTO validation, typed domain errors, idempotent POST, route rate limits, safe
 pagination/search/sort, CSV export, and OpenAPI decorators.
+
+### Add a dashboard page
+
+Start from the `projects` panel in `apps/web/app/dashboard/page.tsx`. Use
+`AdminTable` for lists, `AutocompleteSelect` for related records, and
+`dashboardApi` wrappers for typed API calls. Gate navigation and row actions with
+`can(roles, resource, action)`.
 
 ### Add a shadcn/ui component to apps/web
 
