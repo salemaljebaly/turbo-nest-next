@@ -4,11 +4,13 @@ import {
   ValidationPipe,
   VersioningType,
 } from '@nestjs/common';
+import type { ValidationError } from 'class-validator';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import type { OpenAPIObject } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter.js';
+import { AppException } from './common/errors/app.exception.js';
 import { requestContextMiddleware } from './common/middleware/request-context.middleware.js';
 import { createApiObservability } from './observability/sentry.js';
 
@@ -35,6 +37,10 @@ export function configureApp(app: INestApplication) {
       transform: true,
       forbidNonWhitelisted: true,
       transformOptions: { enableImplicitConversion: true },
+      exceptionFactory: (errors: ValidationError[]) =>
+        new AppException('VALIDATION_FAILED', undefined, {
+          fields: validationDetails(errors),
+        }),
     }),
   );
 
@@ -48,6 +54,21 @@ export function configureApp(app: INestApplication) {
   const document = createOpenApiDocument(app, config);
   SwaggerModule.setup('api/docs', app, document, {
     swaggerOptions: { persistAuthorization: true },
+  });
+}
+
+function validationDetails(errors: ValidationError[]) {
+  return errors.flatMap((error) => {
+    const constraints = Object.values(error.constraints ?? {});
+    const current = constraints.map((message) => ({
+      field: error.property,
+      message,
+    }));
+    const children = (error.children ?? []).map((child) => ({
+      field: `${error.property}.${child.property}`,
+      message: Object.values(child.constraints ?? {}).join(', '),
+    }));
+    return [...current, ...children].filter((item) => item.message);
   });
 }
 

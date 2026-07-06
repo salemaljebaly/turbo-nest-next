@@ -2,6 +2,22 @@
 
 Production-ready monorepo with a **NestJS REST API** and **Next.js** frontend.
 
+## Features
+
+- Standard API success and error envelopes with typed error codes.
+- Better Auth session auth across NestJS and Next.js.
+- Drizzle + PostgreSQL schema/migration workflow.
+- Redis-backed queues, idempotency, rate limiting, and worker health checks.
+- Prometheus `/api/metrics` endpoint protected by bearer token.
+- Health checks for database, Redis, worker heartbeat, and object storage.
+- S3-compatible local object storage through RustFS.
+- CSV export helper with spreadsheet formula protection.
+- Query-safety helpers for pagination, UUID cursors, LIKE search, and sort whitelists.
+- Neutral `projects` example module developers can copy for new API features.
+- OpenAPI generation and typed frontend API schema checks.
+- Sentry wiring for API and web runtime errors.
+- Docker Compose local infrastructure and production image Dockerfiles.
+
 ## Stack
 
 | Layer         | Package                    | Version  |
@@ -32,7 +48,8 @@ Production-ready monorepo with a **NestJS REST API** and **Next.js** frontend.
 │   │       ├── auth/               # Better Auth integration + AuthGuard
 │   │       ├── common/filters/     # Global exception filter
 │   │       ├── database/           # Drizzle DB module (NestJS DI)
-│   │       ├── health/             # GET /api/health (DB + Redis probes)
+│   │       ├── health/             # GET /api/health (DB, Redis, storage, worker)
+│   │       ├── projects/           # Copyable example CRUD module
 │   │       └── users/              # Example feature module (GET /api/v1/users/me)
 │   └── web/                        # Next.js frontend (port 3000)
 │       ├── app/                    # App Router pages + layouts
@@ -95,6 +112,7 @@ pnpm dev
 | API                    | http://localhost:3001/api                   |
 | Swagger                | http://localhost:3001/api/docs              |
 | Health                 | http://localhost:3001/api/health            |
+| Metrics                | http://localhost:3001/api/metrics           |
 | Invitation accept flow | http://localhost:3000/accept-invitation/:id |
 | RustFS console         | http://localhost:9001                       |
 | MailHog UI             | http://localhost:8025                       |
@@ -123,6 +141,7 @@ Short guides:
 
 - [Before you start](./docs/before-you-start.md)
 - [Architecture](./docs/architecture.md)
+- [API platform](./docs/api-platform.md)
 - [Scaling path](./docs/scaling.md)
 - [shadcn presets](./docs/shadcn.md)
 - [Stress testing](./docs/stress-testing.md)
@@ -145,6 +164,10 @@ nest generate module features/posts
 nest generate controller features/posts
 nest generate service features/posts
 ```
+
+For a full copyable module, start from `apps/api/src/projects`. It demonstrates
+DTO validation, typed domain errors, idempotent POST, route rate limits, safe
+pagination/search/sort, CSV export, and OpenAPI decorators.
 
 ### Add a shadcn/ui component to apps/web
 

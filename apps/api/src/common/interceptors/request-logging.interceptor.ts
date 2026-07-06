@@ -8,6 +8,7 @@ import {
 import type { Response } from 'express';
 import { finalize, type Observable } from 'rxjs';
 import type { RequestWithContext } from '../middleware/request-context.middleware.js';
+import { metricPath, metrics } from '../../observability/metrics.js';
 
 @Injectable()
 export class RequestLoggingInterceptor implements NestInterceptor {
@@ -22,10 +23,16 @@ export class RequestLoggingInterceptor implements NestInterceptor {
       finalize(() => {
         const durationMs = Date.now() - startedAt;
         const requestId = request.context?.requestId ?? 'unknown';
+        const path = request.originalUrl ?? request.url;
+        metrics.observeHttpDuration(durationMs / 1000, {
+          method: request.method,
+          path: metricPath(path),
+          status: response.statusCode,
+        });
         const message = JSON.stringify({
           requestId,
           method: request.method,
-          path: request.originalUrl ?? request.url,
+          path,
           statusCode: response.statusCode,
           durationMs,
         });

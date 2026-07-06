@@ -36,6 +36,16 @@ RUN pnpm --filter=@repo/db build && \
     pnpm --filter=@repo/api build
 RUN pnpm --filter=@repo/api bundle
 
+# --- One-shot schema migrator ---
+FROM deps AS migrator
+RUN apk add --no-cache postgresql-client && \
+    addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 migrator
+COPY packages/db packages/db
+COPY packages/typescript-config packages/typescript-config
+USER migrator
+CMD ["pnpm", "--filter=@repo/db", "db:migrate"]
+
 # --- Production ---
 FROM alpine:3.22 AS runner
 ENV NODE_ENV=production

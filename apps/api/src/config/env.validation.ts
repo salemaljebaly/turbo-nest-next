@@ -20,8 +20,15 @@ const envSchema = z.object({
 
   // Redis (optional)
   REDIS_URL: z.string().optional(),
+  QUEUE_PREFIX: z.string().default('template'),
+  WORKER_HEALTH_REQUIRED: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((value) => value === 'true'),
 
   // Observability (optional)
+  METRICS_TOKEN: z.string().optional(),
+  METRICS_TOKEN_FILE: z.string().optional(),
   SENTRY_DSN: z.string().optional(),
   SENTRY_ENVIRONMENT: z.string().optional(),
   SENTRY_RELEASE: z.string().optional(),
@@ -39,6 +46,9 @@ const envSchema = z.object({
   SMTP_PASS: z.string().optional(),
   SMTP_FROM: z.string().optional(),
   SMTP_SECURE: z.string().optional(),
+
+  // S3-compatible storage (optional)
+  STORAGE_ENDPOINT: z.string().optional(),
 
   // App metadata
   APP_NAME: z.string().default('MyApp'),

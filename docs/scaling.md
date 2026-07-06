@@ -13,6 +13,7 @@ Use the repo as-is:
 - one database
 - local Docker Compose for dependencies
 - contract generation in CI
+- the built-in `projects` module as the pattern for CRUD features
 
 This is the fastest path and should stay the default.
 
@@ -25,6 +26,8 @@ Keep the same runtime shape, but harden ownership:
 - keep database access inside backend providers
 - add focused tests around important workflows
 - keep OpenAPI contract checks required in CI
+- add custom health indicators next to the generic database, Redis, storage,
+  and worker heartbeat checks
 
 ## Large Product
 

@@ -15,6 +15,13 @@
       "when": 1777149629750,
       "tag": "0001_complete_luke_cage",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1783357432548,
+      "tag": "0002_sour_shadowcat",
+      "breakpoints": true
     }
   ]
 }

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ErrorCodeSchema } from "./error-codes.js";
 
 export const ApiSuccessSchema = <T extends z.ZodType>(dataSchema: T) =>
   z.object({
@@ -8,11 +9,13 @@ export const ApiSuccessSchema = <T extends z.ZodType>(dataSchema: T) =>
   });
 
 export const ApiErrorSchema = z.object({
-  success: z.literal(false),
   error: z.object({
-    code: z.string(),
+    code: ErrorCodeSchema.or(z.string()),
     message: z.string(),
-    details: z.unknown().optional(),
+    details: z.record(z.string(), z.unknown()).optional(),
+    requestId: z.string().optional(),
+    path: z.string().optional(),
+    timestamp: z.string().optional(),
   }),
 });
 
@@ -38,11 +41,7 @@ export function isApiSuccess<T = unknown>(
 }
 
 export function isApiError(value: unknown): value is ApiError {
-  if (
-    typeof value !== "object" ||
-    value === null ||
-    (value as { success?: unknown }).success !== false
-  ) {
+  if (typeof value !== "object" || value === null || !("error" in value)) {
     return false;
   }
 

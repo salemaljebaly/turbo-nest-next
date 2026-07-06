@@ -15,6 +15,12 @@ export const QUEUE_NAMES = {
 
 export type QueueName = (typeof QUEUE_NAMES)[keyof typeof QUEUE_NAMES];
 
+export function workerHeartbeatKey(
+  prefix = process.env["QUEUE_PREFIX"] ?? "template",
+) {
+  return `${prefix}:runtime:worker:heartbeat`;
+}
+
 export interface JobPayloadMap {
   "template.ping": {
     message: string;
