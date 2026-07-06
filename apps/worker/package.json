@@ -12,6 +12,7 @@
     "worker:dev": "tsx watch src/main.ts",
     "precheck-types": "pnpm --filter=@repo/jobs build",
     "check-types": "tsc --noEmit",
+    "test": "vitest run src/schedules.spec.ts",
     "lint": "eslint src --max-warnings 0"
   },
   "dependencies": {
@@ -24,6 +25,7 @@
     "@types/node": "^25.5.2",
     "eslint": "^10.2.0",
     "tsx": "^4.21.0",
-    "typescript": "6.0.2"
+    "typescript": "6.0.2",
+    "vitest": "^4.1.2"
   }
 }

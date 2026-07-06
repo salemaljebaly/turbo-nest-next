@@ -13,6 +13,9 @@ import {
 } from '@repo/db';
 import { DATABASE_TOKEN } from '../database/database.module.js';
 import { AppException } from '../common/errors/app.exception.js';
+import { assertDifferentActor } from '../auth/separation-of-duties.js';
+import { NotificationsService } from '../notifications/notifications.service.js';
+import { RealtimeService } from '../realtime/realtime.service.js';
 import {
   boundedIntegerLimit,
   containsLikePattern,
@@ -28,7 +31,11 @@ type ProjectRow = typeof projects.$inferSelect;
 
 @Injectable()
 export class ProjectsService {
-  constructor(@Inject(DATABASE_TOKEN) private readonly db: Database) {}
+  constructor(
+    @Inject(DATABASE_TOKEN) private readonly db: Database,
+    private readonly realtime: RealtimeService,
+    private readonly notifications: NotificationsService,
+  ) {}
 
   async create(ownerId: string, dto: CreateProjectDto) {
     const [project] = await this.db
@@ -36,10 +43,12 @@ export class ProjectsService {
       .values({
         id: randomUUID(),
         ownerId,
+        requestedById: ownerId,
         name: dto.name,
         description: dto.description,
       })
       .returning();
+    this.realtime.emitToUser(ownerId, 'project.updated', project);
     return project;
   }
 
@@ -96,7 +105,33 @@ export class ProjectsService {
       .set({ ...dto, updatedAt: new Date() })
       .where(and(eq(projects.ownerId, ownerId), eq(projects.id, id)))
       .returning();
+    this.realtime.emitToUser(ownerId, 'project.updated', project);
     return project;
+  }
+
+  async approve(ownerId: string, id: string, approvedById: string) {
+    const project = await this.get(ownerId, id);
+    assertDifferentActor(
+      project.requestedById ?? project.ownerId,
+      approvedById,
+    );
+    const [approved] = await this.db
+      .update(projects)
+      .set({
+        status: 'approved',
+        approvedById,
+        approvedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(and(eq(projects.ownerId, ownerId), eq(projects.id, id)))
+      .returning();
+    this.realtime.emitToUser(ownerId, 'project.updated', approved);
+    await this.notifications.queue(
+      ownerId,
+      'Project approved',
+      `${approved?.name ?? 'Project'} was approved.`,
+    );
+    return approved;
   }
 
   async exportRows(ownerId: string): Promise<ProjectRow[]> {

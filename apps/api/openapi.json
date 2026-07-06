@@ -46,6 +46,143 @@
         "tags": ["observability"]
       }
     },
+    "/api/auth/{path}": {
+      "get": {
+        "operationId": "AuthController_handleAuth_get",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["Auth"]
+      },
+      "post": {
+        "operationId": "AuthController_handleAuth_post",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["Auth"]
+      },
+      "put": {
+        "operationId": "AuthController_handleAuth_put",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["Auth"]
+      },
+      "delete": {
+        "operationId": "AuthController_handleAuth_delete",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["Auth"]
+      },
+      "patch": {
+        "operationId": "AuthController_handleAuth_patch",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["Auth"]
+      },
+      "options": {
+        "operationId": "AuthController_handleAuth_options",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["Auth"]
+      },
+      "head": {
+        "operationId": "AuthController_handleAuth_head",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["Auth"]
+      },
+      "search": {
+        "operationId": "AuthController_handleAuth_search",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["Auth"]
+      }
+    },
+    "/api/v1/storage/uploads": {
+      "post": {
+        "operationId": "StorageController_createUpload_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUploadDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a presigned object upload URL",
+        "tags": ["storage"]
+      }
+    },
+    "/api/v1/storage/uploads/{id}/confirm": {
+      "post": {
+        "operationId": "StorageController_confirm_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Confirm a completed object upload",
+        "tags": ["storage"]
+      }
+    },
     "/api/health": {
       "get": {
         "operationId": "HealthController_check",
@@ -199,88 +336,6 @@
         },
         "summary": "Infrastructure health check (database + cache + storage + worker)",
         "tags": ["health"]
-      }
-    },
-    "/api/auth/{path}": {
-      "get": {
-        "operationId": "AuthController_handleAuth_get",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": ["Auth"]
-      },
-      "post": {
-        "operationId": "AuthController_handleAuth_post",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": ["Auth"]
-      },
-      "put": {
-        "operationId": "AuthController_handleAuth_put",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": ["Auth"]
-      },
-      "delete": {
-        "operationId": "AuthController_handleAuth_delete",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": ["Auth"]
-      },
-      "patch": {
-        "operationId": "AuthController_handleAuth_patch",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": ["Auth"]
-      },
-      "options": {
-        "operationId": "AuthController_handleAuth_options",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": ["Auth"]
-      },
-      "head": {
-        "operationId": "AuthController_handleAuth_head",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": ["Auth"]
-      },
-      "search": {
-        "operationId": "AuthController_handleAuth_search",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": ["Auth"]
       }
     },
     "/api/v1/users": {
@@ -633,6 +688,33 @@
         "summary": "Update a project",
         "tags": ["projects"]
       }
+    },
+    "/api/v1/projects/{id}/approve": {
+      "post": {
+        "operationId": "ProjectsController_approve_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Approve a project with maker-checker protection",
+        "tags": ["projects"]
+      }
     }
   },
   "info": {
@@ -660,6 +742,20 @@
           }
         },
         "required": ["message"]
+      },
+      "CreateUploadDto": {
+        "type": "object",
+        "properties": {
+          "mimeType": {
+            "type": "string",
+            "example": "image/png"
+          },
+          "sizeBytes": {
+            "type": "number",
+            "example": 102400
+          }
+        },
+        "required": ["mimeType", "sizeBytes"]
       },
       "UserResponseDto": {
         "type": "object",

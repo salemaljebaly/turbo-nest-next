@@ -8,6 +8,12 @@ Production-ready monorepo with a **NestJS REST API** and **Next.js** frontend.
 - Better Auth session auth across NestJS and Next.js.
 - Drizzle + PostgreSQL schema/migration workflow.
 - Redis-backed queues, idempotency, rate limiting, and worker health checks.
+- Organization RBAC with `owner`, `admin`, `member`, and `viewer` roles.
+- Resource scoping and maker-checker helpers for approval flows.
+- S3-compatible presigned upload and confirm flow.
+- Audit logging for mutating endpoints.
+- Console-backed notification module and generic realtime gateway.
+- Declarative worker recurring schedules.
 - Prometheus `/api/metrics` endpoint protected by bearer token.
 - Health checks for database, Redis, worker heartbeat, and object storage.
 - S3-compatible local object storage through RustFS.
@@ -142,6 +148,7 @@ Short guides:
 - [Before you start](./docs/before-you-start.md)
 - [Architecture](./docs/architecture.md)
 - [API platform](./docs/api-platform.md)
+- [Platform modules](./docs/platform-modules.md)
 - [Scaling path](./docs/scaling.md)
 - [shadcn presets](./docs/shadcn.md)
 - [Stress testing](./docs/stress-testing.md)

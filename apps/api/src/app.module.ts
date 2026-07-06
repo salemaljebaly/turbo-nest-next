@@ -4,6 +4,8 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { resolve } from 'node:path';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
+import { AdminAuditInterceptor } from './audit/admin-audit.interceptor.js';
+import { AuditModule } from './audit/audit.module.js';
 import { IdempotencyInterceptor } from './common/interceptors/idempotency.interceptor.js';
 import { ApiResponseInterceptor } from './common/interceptors/api-response.interceptor.js';
 import { RateLimitInterceptor } from './common/interceptors/rate-limit.interceptor.js';
@@ -17,7 +19,10 @@ import { JobsModule } from './jobs/jobs.module.js';
 import { MetricsController } from './observability/metrics.controller.js';
 import { QueueMetricsService } from './observability/queue-metrics.service.js';
 import { SentrySmokeController } from './observability/sentry-smoke.controller.js';
+import { NotificationsModule } from './notifications/notifications.module.js';
 import { ProjectsModule } from './projects/projects.module.js';
+import { RealtimeModule } from './realtime/realtime.module.js';
+import { StorageModule } from './storage/storage.module.js';
 import { UsersModule } from './users/users.module.js';
 
 @Module({
@@ -34,6 +39,10 @@ import { UsersModule } from './users/users.module.js';
     }),
     DatabaseModule,
     RedisModule,
+    AuditModule,
+    NotificationsModule,
+    RealtimeModule,
+    StorageModule,
     HealthModule,
     AuthModule,
     UsersModule,
@@ -59,6 +68,10 @@ import { UsersModule } from './users/users.module.js';
     {
       provide: APP_INTERCEPTOR,
       useClass: RequestLoggingInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: AdminAuditInterceptor,
     },
   ],
 })

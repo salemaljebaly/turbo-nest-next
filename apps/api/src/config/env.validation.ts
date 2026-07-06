@@ -49,6 +49,10 @@ const envSchema = z.object({
 
   // S3-compatible storage (optional)
   STORAGE_ENDPOINT: z.string().optional(),
+  STORAGE_REGION: z.string().default('us-east-1'),
+  STORAGE_BUCKET: z.string().default('uploads'),
+  STORAGE_ACCESS_KEY: z.string().optional(),
+  STORAGE_SECRET_KEY: z.string().optional(),
 
   // App metadata
   APP_NAME: z.string().default('MyApp'),

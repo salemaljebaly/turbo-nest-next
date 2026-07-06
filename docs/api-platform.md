@@ -96,4 +96,5 @@ production-only modules.
 `apps/api/src/projects` is the neutral reference module for new features. It
 demonstrates DTO validation, authenticated owner scoping, `AppException` codes,
 idempotent create, rate-limited list, safe search/sort/pagination, CSV export,
-OpenAPI decorators, and focused service tests.
+OpenAPI decorators, RBAC, audit annotations, maker-checker approval, realtime
+events, notifications, and focused service tests.

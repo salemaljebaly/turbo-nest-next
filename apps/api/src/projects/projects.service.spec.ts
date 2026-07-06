@@ -10,7 +10,11 @@ describe(ProjectsService.name, () => {
         }),
       })),
     };
-    const service = new ProjectsService(db as never);
+    const service = new ProjectsService(
+      db as never,
+      { emitToUser: vi.fn() } as never,
+      { queue: vi.fn() } as never,
+    );
 
     await expect(service.get('user-1', 'project-1')).rejects.toMatchObject({
       response: expect.objectContaining({ code: 'PROJECT_NOT_FOUND' }),

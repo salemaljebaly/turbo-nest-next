@@ -2,3 +2,4 @@
 export * from "./pagination.js";
 export * from "./api-response.js";
 export * from "./error-codes.js";
+export * from "./permissions.js";
