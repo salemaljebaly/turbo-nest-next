@@ -89,10 +89,6 @@ export class ProjectsController {
   @AuditAction('project.approve', 'project')
   @ApiOperation({ summary: 'Approve a project with maker-checker protection' })
   approve(@Req() request: SessionRequest, @Param('id') id: string) {
-    return this.projects.approve(
-      request.session.user.id,
-      id,
-      request.session.user.id,
-    );
+    return this.projects.approve(request.session.user.id, id);
   }
 }
