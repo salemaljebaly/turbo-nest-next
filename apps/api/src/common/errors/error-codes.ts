@@ -22,6 +22,10 @@ export const ERROR_CODES = {
     status: HttpStatus.CONFLICT,
     message: 'Idempotency-Key was already used for a different request',
   },
+  IDEMPOTENCY_IN_PROGRESS: {
+    status: HttpStatus.CONFLICT,
+    message: 'Idempotency-Key is already processing',
+  },
   INVALID_CURSOR: {
     status: HttpStatus.BAD_REQUEST,
     message: 'cursor must be a valid UUID',

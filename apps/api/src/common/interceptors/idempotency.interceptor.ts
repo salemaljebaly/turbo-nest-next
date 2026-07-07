@@ -7,12 +7,34 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { eq, idempotencyKeys, type Database } from '@repo/db';
+import { and, eq, idempotencyKeys, lt, or, type Database } from '@repo/db';
 import type { Request } from 'express';
-import { from, mergeMap, of, type Observable } from 'rxjs';
+import {
+  catchError,
+  from,
+  mergeMap,
+  of,
+  throwError,
+  type Observable,
+} from 'rxjs';
 import { DATABASE_TOKEN } from '../../database/database.module.js';
 import { IDEMPOTENT_KEY } from '../decorators/idempotent.decorator.js';
 import { AppException } from '../errors/app.exception.js';
+
+const IDEMPOTENCY_TTL_MS = 24 * 60 * 60 * 1000;
+const IDEMPOTENCY_IN_PROGRESS_TTL_MS = 60 * 1000;
+
+type IdempotencyRequest = Request & {
+  session?: {
+    user?: {
+      id?: string;
+    };
+  };
+};
+
+type IdempotencyReservation =
+  | { action: 'execute' }
+  | { action: 'replay'; response: unknown };
 
 function stableStringify(value: unknown): string {
   if (value === null || typeof value !== 'object') return JSON.stringify(value);
@@ -49,8 +71,13 @@ export class IdempotencyInterceptor implements NestInterceptor {
 
     if (!isIdempotent) return next.handle();
 
-    const request = context.switchToHttp().getRequest<Request>();
+    const request = context.switchToHttp().getRequest<IdempotencyRequest>();
+    const userId = request.session?.user?.id;
     const key = request.header('idempotency-key')?.trim();
+
+    if (!userId) {
+      throw new AppException('FORBIDDEN');
+    }
 
     if (!key) {
       throw new AppException(
@@ -64,48 +91,116 @@ export class IdempotencyInterceptor implements NestInterceptor {
 
     const requestHash = hashRequest(request);
 
-    return from(this.findOrCreate(key, requestHash)).pipe(
-      mergeMap((existing) => {
-        if (existing?.status === 'completed') return of(existing.response);
+    return from(this.reserve(userId, key, requestHash)).pipe(
+      mergeMap((reservation) => {
+        if (reservation.action === 'replay') return of(reservation.response);
 
-        return next
-          .handle()
-          .pipe(
-            mergeMap((response: unknown) =>
-              from(this.persistResponse(key, response)).pipe(
-                mergeMap(() => of(response)),
-              ),
+        return next.handle().pipe(
+          mergeMap((response: unknown) =>
+            from(this.persistResponse(userId, key, response)).pipe(
+              mergeMap(() => of(response)),
             ),
-          );
+          ),
+          catchError((error: unknown) =>
+            from(this.releaseReservation(userId, key)).pipe(
+              mergeMap(() => throwError(() => error)),
+            ),
+          ),
+        );
       }),
     );
   }
 
-  private async findOrCreate(key: string, requestHash: string) {
+  private async reserve(
+    userId: string,
+    key: string,
+    requestHash: string,
+  ): Promise<IdempotencyReservation> {
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + IDEMPOTENCY_TTL_MS);
+    const staleBefore = new Date(
+      now.getTime() - IDEMPOTENCY_IN_PROGRESS_TTL_MS,
+    );
+
+    const [inserted] = await this.db
+      .insert(idempotencyKeys)
+      .values({
+        id: randomUUID(),
+        userId,
+        key,
+        requestHash,
+        status: 'in_progress',
+        expiresAt,
+      })
+      .onConflictDoNothing({
+        target: [idempotencyKeys.userId, idempotencyKeys.key],
+      })
+      .returning();
+
+    if (inserted) return { action: 'execute' };
+
+    const existing = await this.findExisting(userId, key);
+    if (!existing) return { action: 'execute' };
+
+    if (existing.requestHash !== requestHash) {
+      throw new AppException('IDEMPOTENCY_CONFLICT');
+    }
+
+    if (existing.status === 'completed' && existing.expiresAt > now) {
+      return { action: 'replay', response: existing.response };
+    }
+
+    if (
+      existing.status === 'in_progress' &&
+      existing.createdAt > staleBefore &&
+      existing.expiresAt > now
+    ) {
+      throw new AppException('IDEMPOTENCY_IN_PROGRESS');
+    }
+
+    const [reserved] = await this.db
+      .update(idempotencyKeys)
+      .set({
+        requestHash,
+        response: null,
+        status: 'in_progress',
+        expiresAt,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .where(
+        and(
+          eq(idempotencyKeys.userId, userId),
+          eq(idempotencyKeys.key, key),
+          or(
+            lt(idempotencyKeys.expiresAt, now),
+            lt(idempotencyKeys.createdAt, staleBefore),
+          ),
+        ),
+      )
+      .returning();
+
+    if (!reserved) throw new AppException('IDEMPOTENCY_IN_PROGRESS');
+
+    return { action: 'execute' };
+  }
+
+  private async findExisting(userId: string, key: string) {
     const [existing] = await this.db
       .select()
       .from(idempotencyKeys)
-      .where(eq(idempotencyKeys.key, key));
+      .where(
+        and(eq(idempotencyKeys.userId, userId), eq(idempotencyKeys.key, key)),
+      );
 
-    if (existing) {
-      if (existing.requestHash !== requestHash) {
-        throw new AppException('IDEMPOTENCY_CONFLICT');
-      }
-      return existing;
-    }
-
-    await this.db.insert(idempotencyKeys).values({
-      id: randomUUID(),
-      key,
-      requestHash,
-      status: 'in_progress',
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-    });
-
-    return null;
+    return existing;
   }
 
-  private async persistResponse(key: string, response: unknown) {
+  private async persistResponse(
+    userId: string,
+    key: string,
+    response: unknown,
+  ) {
     await this.db
       .update(idempotencyKeys)
       .set({
@@ -113,6 +208,16 @@ export class IdempotencyInterceptor implements NestInterceptor {
         status: 'completed',
         updatedAt: new Date(),
       })
-      .where(eq(idempotencyKeys.key, key));
+      .where(
+        and(eq(idempotencyKeys.userId, userId), eq(idempotencyKeys.key, key)),
+      );
+  }
+
+  private async releaseReservation(userId: string, key: string) {
+    await this.db
+      .delete(idempotencyKeys)
+      .where(
+        and(eq(idempotencyKeys.userId, userId), eq(idempotencyKeys.key, key)),
+      );
   }
 }

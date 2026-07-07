@@ -7,6 +7,7 @@ export const ErrorCodeSchema = z.enum([
   "CONFLICT",
   "RATE_LIMITED",
   "IDEMPOTENCY_CONFLICT",
+  "IDEMPOTENCY_IN_PROGRESS",
   "INVALID_CURSOR",
   "INVALID_LIMIT",
   "PROJECT_NOT_FOUND",
