@@ -3,6 +3,11 @@
 The API exposes Prometheus metrics at `/api/metrics` when called with
 `Authorization: Bearer $METRICS_TOKEN`.
 
+Production deployments must set `METRICS_TOKEN` or `METRICS_TOKEN_FILE`.
+Without one of those values, `/api/metrics` returns `403` in production. Local
+and non-production environments can serve metrics without a token and log a
+warning to make first-run development simpler.
+
 The single-server deploy profile includes an optional Grafana Alloy service:
 
 ```bash

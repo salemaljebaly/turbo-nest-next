@@ -33,4 +33,22 @@ describe('Prometheus metrics', () => {
       } as never),
     ).toContain('# HELP');
   });
+
+  it('fails closed in production when no metrics token is configured', () => {
+    const controller = new MetricsController({
+      get: (key: string) => (key === 'NODE_ENV' ? 'production' : undefined),
+    } as never);
+
+    expect(() => controller.read({ headers: {} } as never)).toThrow(
+      ForbiddenException,
+    );
+  });
+
+  it('allows local metrics without a token outside production', () => {
+    const controller = new MetricsController({
+      get: (key: string) => (key === 'NODE_ENV' ? 'development' : undefined),
+    } as never);
+
+    expect(controller.read({ headers: {} } as never)).toContain('# HELP');
+  });
 });
