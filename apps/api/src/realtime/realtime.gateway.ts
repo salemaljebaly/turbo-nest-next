@@ -8,9 +8,16 @@ import {
 import { fromNodeHeaders } from 'better-auth/node';
 import type { Server, Socket } from 'socket.io';
 import { AUTH_TOKEN, type Auth } from '../auth/auth.js';
+import { parseCorsOriginsValue } from '../common/cors.js';
 import { RealtimeService } from './realtime.service.js';
 
-@WebSocketGateway({ cors: { origin: true, credentials: true } })
+export const REALTIME_CORS_ORIGINS = parseCorsOriginsValue(
+  process.env['CORS_ORIGINS'],
+);
+
+@WebSocketGateway({
+  cors: { origin: REALTIME_CORS_ORIGINS, credentials: true },
+})
 export class RealtimeGateway implements OnGatewayConnection {
   private readonly logger = new Logger(RealtimeGateway.name);
 

@@ -41,6 +41,7 @@ export class AiController {
       body,
     );
 
+    response.setHeader('x-conversation-id', result.conversationId);
     result.pipeUIMessageStreamToResponse(response);
   }
 }

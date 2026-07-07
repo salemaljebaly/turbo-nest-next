@@ -42,6 +42,12 @@ Conversations and messages are stored in:
 
 Rows are scoped by `userId` and optionally `organizationId`.
 
+`POST /api/v1/ai/chat` returns the active conversation id in the
+`x-conversation-id` response header. Clients should send that id as
+`conversationId` on later chat requests to append to the same conversation. The
+API verifies the conversation belongs to the authenticated user before storing
+or streaming new messages.
+
 ## Tools
 
 The example `listProjects` tool calls `ProjectsService.list()` for the current

@@ -17,7 +17,7 @@ export class PermissionsService {
     const organizationId = session.session.activeOrganizationId;
     if (!organizationId) return parseRole(undefined);
 
-    const [row] = await this.db
+    const rows = (await this.db
       .select({ role: member.role })
       .from(member)
       .where(
@@ -26,9 +26,9 @@ export class PermissionsService {
           eq(member.organizationId, organizationId),
         ),
       )
-      .limit(1);
+      .limit(1)) as Array<{ role: string | null }>;
 
-    return parseRole(row?.role);
+    return parseRole(rows[0]?.role);
   }
 
   async can(

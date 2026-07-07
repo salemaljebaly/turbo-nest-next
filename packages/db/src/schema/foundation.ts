@@ -5,6 +5,7 @@ import {
   pgTable,
   text,
   timestamp,
+  uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
 import { user } from "./auth.js";
@@ -18,7 +19,10 @@ export const idempotencyKeys = pgTable(
   "idempotency_keys",
   {
     id: uuid("id").primaryKey(),
-    key: text("key").notNull().unique(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    key: text("key").notNull(),
     requestHash: text("request_hash").notNull(),
     response: jsonb("response"),
     status: idempotencyStatus("status").notNull().default("in_progress"),
@@ -31,6 +35,7 @@ export const idempotencyKeys = pgTable(
       .defaultNow(),
   },
   (table) => [
+    uniqueIndex("idempotency_keys_user_key_unique").on(table.userId, table.key),
     index("idempotency_keys_expires_at_idx").on(table.expiresAt),
     index("idempotency_keys_status_idx").on(table.status),
   ],

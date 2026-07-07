@@ -1,13 +1,20 @@
 import "dotenv/config";
 
+import { createDbConnection } from "@repo/db";
 import {
   QUEUE_NAMES,
   createRedisConnection,
   createWorker,
   workerHeartbeatKey,
 } from "@repo/jobs";
+import {
+  createMaintenanceProcessor,
+  processDefaultJob,
+  processNotificationJob,
+} from "./processors.js";
 import { registerRecurringSchedules } from "./schedules.js";
 
+const database = createDbConnection();
 const heartbeat = process.env["REDIS_URL"]
   ? createRedisConnection(process.env["REDIS_URL"])
   : null;
@@ -21,51 +28,33 @@ async function writeHeartbeat() {
   );
 }
 
-const worker = createWorker(QUEUE_NAMES.default, async (job) => {
-  switch (job.name) {
-    case "template.ping":
-      console.info("Processed template ping job", {
-        id: job.id,
-        message: (job.data as { message: string }).message,
-        processedAt: new Date().toISOString(),
-      });
-      return { ok: true, processedAt: new Date().toISOString() };
-    case "maintenance.daily-cleanup":
-      console.info("Processed daily cleanup job", {
-        id: job.id,
-        processedAt: new Date().toISOString(),
-      });
-      return { ok: true, processedAt: new Date().toISOString() };
-    case "notification.send":
-      console.info("Processed notification send job", {
-        id: job.id,
-        notificationId: (job.data as { notificationId: string }).notificationId,
-        processedAt: new Date().toISOString(),
-      });
-      return { ok: true, processedAt: new Date().toISOString() };
-    default:
-      throw new Error(`Unsupported job: ${job.name satisfies never}`);
-  }
-});
+const workers = [
+  createWorker(QUEUE_NAMES.default, processDefaultJob),
+  createWorker(QUEUE_NAMES.maintenance, createMaintenanceProcessor(database.db)),
+  createWorker(QUEUE_NAMES.notifications, processNotificationJob),
+];
 
 void registerRecurringSchedules();
 void writeHeartbeat();
 const heartbeatTimer = setInterval(() => void writeHeartbeat(), 30_000);
 heartbeatTimer.unref();
 
-worker.on("completed", (job) => {
-  console.info(`Job completed: ${job.name}#${job.id}`);
-});
+for (const worker of workers) {
+  worker.on("completed", (job) => {
+    console.info(`Job completed: ${job.name}#${job.id}`);
+  });
 
-worker.on("failed", (job, error) => {
-  console.error(`Job failed: ${job?.name ?? "unknown"}#${job?.id}`, error);
-});
+  worker.on("failed", (job, error) => {
+    console.error(`Job failed: ${job?.name ?? "unknown"}#${job?.id}`, error);
+  });
+}
 
 async function shutdown(signal: NodeJS.Signals) {
   console.info(`Received ${signal}; closing worker`);
   clearInterval(heartbeatTimer);
   await heartbeat?.quit().catch(() => undefined);
-  await worker.close();
+  await Promise.all(workers.map((worker) => worker.close()));
+  await database.close();
   process.exit(0);
 }
 

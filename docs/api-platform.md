@@ -65,8 +65,9 @@ cells to avoid formula injection.
 ## Metrics
 
 `GET /api/metrics` serves Prometheus text metrics. Set `METRICS_TOKEN` or
-`METRICS_TOKEN_FILE` to require `Authorization: Bearer <token>`. HTTP latency
-uses normalized paths to avoid high-cardinality route labels. Queue metrics are
+`METRICS_TOKEN_FILE` and call with `Authorization: Bearer <token>`. Production
+fails closed with `403` when neither value is configured. HTTP latency uses
+normalized paths to avoid high-cardinality route labels. Queue metrics are
 collected from BullMQ when `REDIS_URL` is configured.
 
 ## Health Indicators

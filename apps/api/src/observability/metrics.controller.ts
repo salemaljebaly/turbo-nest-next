@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   Get,
   Header,
+  Logger,
   Req,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -17,12 +18,27 @@ import { metrics } from './metrics.js';
 @SkipApiEnvelope()
 @Controller('metrics')
 export class MetricsController {
+  private readonly logger = new Logger(MetricsController.name);
+
   constructor(private readonly config: ConfigService) {}
 
   @Get()
   @Header('content-type', 'text/plain; version=0.0.4; charset=utf-8')
   read(@Req() request: Request) {
     const expected = this.metricsToken();
+    if (!expected) {
+      if (this.isProduction()) {
+        throw new ForbiddenException({
+          code: 'FORBIDDEN',
+          message: 'Metrics credentials are not configured',
+        });
+      }
+      this.logger.warn(
+        'Serving /metrics without credentials because METRICS_TOKEN is not configured outside production',
+      );
+      return metrics.render();
+    }
+
     if (expected && !secureEqual(bearerToken(request), expected)) {
       throw new ForbiddenException({
         code: 'FORBIDDEN',
@@ -42,6 +58,10 @@ export class MetricsController {
     } catch {
       return undefined;
     }
+  }
+
+  private isProduction() {
+    return this.config.get<string>('NODE_ENV') === 'production';
   }
 }
 

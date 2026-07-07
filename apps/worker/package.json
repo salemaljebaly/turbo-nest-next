@@ -5,17 +5,18 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "prebuild": "pnpm --filter=@repo/jobs build",
+    "prebuild": "pnpm --filter=@repo/db build && pnpm --filter=@repo/jobs build",
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/main.js",
     "preworker:dev": "pnpm --filter=@repo/jobs build",
     "worker:dev": "tsx watch src/main.ts",
-    "precheck-types": "pnpm --filter=@repo/jobs build",
+    "precheck-types": "pnpm --filter=@repo/db build && pnpm --filter=@repo/jobs build",
     "check-types": "tsc --noEmit",
-    "test": "vitest run src/schedules.spec.ts",
+    "test": "vitest run src/*.spec.ts",
     "lint": "eslint src --max-warnings 0"
   },
   "dependencies": {
+    "@repo/db": "workspace:*",
     "@repo/jobs": "workspace:*",
     "dotenv": "^17.4.1"
   },

@@ -1,16 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
-import {
-  and,
-  asc,
-  desc,
-  eq,
-  gt,
-  projects,
-  sql,
-  type Database,
-  type SQLWrapper,
-} from '@repo/db';
+import { and, eq, gt, projects, sql, type Database } from '@repo/db';
 import { DATABASE_TOKEN } from '../database/database.module.js';
 import { AppException } from '../common/errors/app.exception.js';
 import { assertDifferentActor } from '../auth/separation-of-duties.js';
@@ -27,7 +17,18 @@ import type { ListProjectsDto } from './dto/list-projects.dto.js';
 import type { UpdateProjectDto } from './dto/update-project.dto.js';
 
 const sortColumns = ['name', 'createdAt'] as const;
-type ProjectRow = typeof projects.$inferSelect;
+type ProjectRow = {
+  id: string;
+  ownerId: string;
+  name: string;
+  description: string | null;
+  status: string;
+  requestedById: string | null;
+  approvedById: string | null;
+  approvedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 @Injectable()
 export class ProjectsService {
@@ -65,16 +66,14 @@ export class ProjectsService {
       cursor ? gt(projects.id, cursor) : undefined,
       search ? sql`${projects.name} ILIKE ${search} ESCAPE '\\'` : undefined,
     );
-    let orderBy: SQLWrapper;
-    if (sort.column === 'name') {
-      orderBy =
-        sort.direction === 'asc' ? asc(projects.name) : desc(projects.name);
-    } else {
-      orderBy =
-        sort.direction === 'asc'
-          ? asc(projects.createdAt)
-          : desc(projects.createdAt);
-    }
+    const orderBy =
+      sort.column === 'name'
+        ? sort.direction === 'asc'
+          ? sql`${projects.name} ASC`
+          : sql`${projects.name} DESC`
+        : sort.direction === 'asc'
+          ? sql`${projects.createdAt} ASC`
+          : sql`${projects.createdAt} DESC`;
 
     const rows = await this.db
       .select()
@@ -89,7 +88,7 @@ export class ProjectsService {
     };
   }
 
-  async get(ownerId: string, id: string) {
+  async get(ownerId: string, id: string): Promise<ProjectRow> {
     const [project] = await this.db
       .select()
       .from(projects)
@@ -98,36 +97,50 @@ export class ProjectsService {
     return project;
   }
 
+  async getForApproval(id: string): Promise<ProjectRow> {
+    const [project] = await this.db
+      .select()
+      .from(projects)
+      .where(eq(projects.id, id));
+    if (!project) throw new AppException('PROJECT_NOT_FOUND');
+    return project;
+  }
+
   async update(ownerId: string, id: string, dto: UpdateProjectDto) {
-    await this.get(ownerId, id);
+    const existing = await this.get(ownerId, id);
+    if (existing.status === 'archived') {
+      throw new AppException('PROJECT_ARCHIVED');
+    }
     const [project] = await this.db
       .update(projects)
       .set({ ...dto, updatedAt: new Date() })
       .where(and(eq(projects.ownerId, ownerId), eq(projects.id, id)))
       .returning();
+    if (!project) throw new AppException('PROJECT_NOT_FOUND');
     this.realtime.emitToUser(ownerId, 'project.updated', project);
     return project;
   }
 
-  async approve(ownerId: string, id: string, approvedById: string) {
-    const project = await this.get(ownerId, id);
-    assertDifferentActor(
-      project.requestedById ?? project.ownerId,
-      approvedById,
-    );
+  async approve(approverId: string, id: string) {
+    const project = await this.getForApproval(id);
+    if (project.status === 'archived') {
+      throw new AppException('PROJECT_ARCHIVED');
+    }
+    assertDifferentActor(project.requestedById ?? project.ownerId, approverId);
     const [approved] = await this.db
       .update(projects)
       .set({
         status: 'approved',
-        approvedById,
+        approvedById: approverId,
         approvedAt: new Date(),
         updatedAt: new Date(),
       })
-      .where(and(eq(projects.ownerId, ownerId), eq(projects.id, id)))
+      .where(eq(projects.id, id))
       .returning();
-    this.realtime.emitToUser(ownerId, 'project.updated', approved);
+    if (!approved) throw new AppException('PROJECT_NOT_FOUND');
+    this.realtime.emitToUser(project.ownerId, 'project.updated', approved);
     await this.notifications.queue(
-      ownerId,
+      project.ownerId,
       'Project approved',
       `${approved?.name ?? 'Project'} was approved.`,
     );
