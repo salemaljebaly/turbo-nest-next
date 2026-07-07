@@ -5,6 +5,7 @@ import { enqueueJob, QUEUE_NAMES } from '@repo/jobs';
 import { DATABASE_TOKEN } from '../database/database.module.js';
 import {
   NOTIFICATION_PROVIDER,
+  type NotificationPayload,
   type NotificationProvider,
 } from './notification-provider.js';
 
@@ -36,10 +37,11 @@ export class NotificationsService {
   }
 
   async send(notificationId: string) {
-    const [notification] = await this.db
+    const rows = (await this.db
       .select()
       .from(notifications)
-      .where(eq(notifications.id, notificationId));
+      .where(eq(notifications.id, notificationId))) as NotificationPayload[];
+    const [notification] = rows;
     if (!notification) return;
     await this.provider.send(notification);
     await this.db
