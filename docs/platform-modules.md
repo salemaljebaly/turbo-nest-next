@@ -52,7 +52,8 @@ interceptor records actor, action, entity type, entity id, and request diff in
 `RealtimeModule` exposes an authenticated Socket.IO gateway and `RealtimeService`.
 Clients join `user:<id>` and, when available, `org:<id>` rooms after Better Auth
 session validation. Feature modules inject `RealtimeService` and call
-`emitToUser()` or `emitToOrg()`.
+`emitToUser()` or `emitToOrg()`. Socket.IO CORS uses the same `CORS_ORIGINS`
+allow-list as HTTP CORS and keeps credentials enabled for the session cookie.
 
 ## Worker Schedules
 

@@ -11,15 +11,14 @@ import type { OpenAPIObject } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter.js';
 import { AppException } from './common/errors/app.exception.js';
+import { parseCorsOriginsValue } from './common/cors.js';
 import { requestContextMiddleware } from './common/middleware/request-context.middleware.js';
 import { createApiObservability } from './observability/sentry.js';
 
 export function parseCorsOrigins(config: ConfigService): string[] {
-  return config
-    .get<string>('CORS_ORIGINS', 'http://localhost:3000')
-    .split(',')
-    .map((origin) => origin.trim())
-    .filter(Boolean);
+  return parseCorsOriginsValue(
+    config.get<string>('CORS_ORIGINS', 'http://localhost:3000'),
+  );
 }
 
 export function configureApp(app: INestApplication) {
