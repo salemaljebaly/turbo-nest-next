@@ -8,7 +8,7 @@ import {
   defineTool,
   isAiConfigured,
 } from '@repo/ai';
-import { aiConversations, aiMessages, eq, type Database } from '@repo/db';
+import { aiConversations, aiMessages, and, eq, type Database } from '@repo/db';
 import { convertToModelMessages, streamText, type UIMessage } from 'ai';
 import type { Response } from 'express';
 import { z } from 'zod';
@@ -28,6 +28,7 @@ type ProjectToolRow = {
 };
 
 type UiStreamResult = {
+  conversationId: string;
   pipeUIMessageStreamToResponse(response: Response): void;
 };
 
@@ -50,11 +51,12 @@ export class AiService {
   ): Promise<UiStreamResult> {
     const model = this.languageModel();
     const conversationId =
-      body.conversationId ??
-      (await this.createConversation(userId, organizationId));
+      body.conversationId !== undefined
+        ? await this.getConversationForUser(userId, body.conversationId)
+        : await this.createConversation(userId, organizationId);
     await this.persistNewUserMessage(conversationId, body.messages);
 
-    return streamText({
+    const stream = streamText({
       model,
       system: composeSystemPrompt([
         'You are the product assistant embedded in this starter template.',
@@ -82,6 +84,11 @@ export class AiService {
         await this.persistAssistantMessage(conversationId, text);
       },
     });
+    return {
+      conversationId,
+      pipeUIMessageStreamToResponse:
+        stream.pipeUIMessageStreamToResponse.bind(stream),
+    };
   }
 
   private aiConfig() {
@@ -118,6 +125,22 @@ export class AiService {
       organizationId,
     });
     return id;
+  }
+
+  private async getConversationForUser(userId: string, conversationId: string) {
+    const [conversation] = await this.db
+      .select()
+      .from(aiConversations)
+      .where(
+        and(
+          eq(aiConversations.id, conversationId),
+          eq(aiConversations.userId, userId),
+        ),
+      );
+    if (!conversation) {
+      throw new AppException('NOT_FOUND', 'Conversation not found');
+    }
+    return conversationId;
   }
 
   private async persistNewUserMessage(

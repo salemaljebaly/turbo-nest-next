@@ -15,16 +15,31 @@ const API_URL =
 export function ChatWidget() {
   const [open, setOpen] = React.useState(false);
   const [input, setInput] = React.useState("");
+  const [conversationId, setConversationId] = React.useState<string | null>(
+    null,
+  );
   const statusQuery = useQuery({
     queryKey: ["ai-status"],
     queryFn: dashboardApi.aiStatus,
     staleTime: 60_000,
   });
+  const transport = React.useMemo(
+    () =>
+      new DefaultChatTransport({
+        api: `${API_URL}/v1/ai/chat`,
+        credentials: "include",
+        body: conversationId ? { conversationId } : {},
+        fetch: async (input, init) => {
+          const response = await fetch(input, init);
+          const nextConversationId = response.headers.get("x-conversation-id");
+          if (nextConversationId) setConversationId(nextConversationId);
+          return response;
+        },
+      }),
+    [conversationId],
+  );
   const { messages, sendMessage, status } = useChat({
-    transport: new DefaultChatTransport({
-      api: `${API_URL}/v1/ai/chat`,
-      credentials: "include",
-    }),
+    transport,
   });
 
   if (statusQuery.isLoading || statusQuery.data?.enabled !== true) {
