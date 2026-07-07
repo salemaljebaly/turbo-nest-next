@@ -10,6 +10,6 @@
     "test:stress": "pnpm build && K6_WEB_DASHBOARD=true K6_WEB_DASHBOARD_EXPORT=dist/report-stress.html k6 run --out json=dist/report-stress.json dist/stress.js"
   },
   "devDependencies": {
-    "esbuild": "^0.25.12"
+    "esbuild": "^0.28.1"
   }
 }
